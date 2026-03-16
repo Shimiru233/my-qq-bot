@@ -1,3 +1,5 @@
+import os
+
 from nonebot.params import CommandArg
 from nonebot.adapters.onebot.v11 import Bot,Event,Message,MessageSegment
 from nonebot import on_startswith
@@ -10,6 +12,8 @@ from nonebot.rule import to_me
 
 import yaml
 import sys
+
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from db import check_song_exists
 
 sys.path.insert(0, "/home/admin/Sources/nonebot/nonebot.venv/lib/python3.12/site-packages")
