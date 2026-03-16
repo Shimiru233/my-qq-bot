@@ -23,8 +23,8 @@ with CONFIG_PATH.open("r", encoding="utf-8") as f:
     data = yaml.safe_load(f)
 
 
-matcher = on_startswith("kard", ignorecase=True)
-@matcher.handle()
+kardMatcher = on_startswith("kard", ignorecase=True)
+@kardMatcher.handle()
 
 async def handle_function(bot: Bot, event: Event, msg: Message = EventMessage()):
     plain_text = msg.extract_plain_text().strip()
@@ -56,11 +56,31 @@ async def handle_function(bot: Bot, event: Event, msg: Message = EventMessage())
         # 发送多图失败就降级只发第一张
         await bot.send(event=event, message=MessageSegment.image(url1))
 
- #   await bot.send(event=event, message=MessageSegment.image(url1))
- #   await bot.send(event=event, message=MessageSegment.image(url2))
 
-matcher2 = on_command("kard")
-@matcher2.handle()
-async def handle_function2(bot: Bot,event: Event):
-        await bot.send(event=event, message="card是{parceled_card_id}")
+guessChartMatcher = on_command("gs", aliases={"猜图"}, ignorecase=True)
+@guessChartMatcher.handle()
+
+async def handle_function(bot: Bot, event: Event, msg: Message = EventMessage()):
+    plain_text = msg.extract_plain_text().strip()
+    parceled_card_id_str = plain_text.replace(" ", "")[2:]
+
+    try:
+        n = int(parceled_card_id_str)
+    except ValueError:
+        await bot.send(event=event, message="不知道。")
+        return
+
+    asset_name = get_assetbundle_name(n)
+    if not asset_name:
+        await bot.send(event=event, message="没找到这个卡。")
+        return
+
+    url = f"{data['asset_api_url'].rstrip('/')}/startapp/character/member/{asset_name}/card_guess.png"
+
+    try:
+        await bot.send(event=event, message=MessageSegment.image(url))
+    except ActionFailed:
+        await bot.send(event=event, message="发送图片失败了。")
+
+
 
