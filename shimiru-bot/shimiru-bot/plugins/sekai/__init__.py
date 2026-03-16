@@ -10,7 +10,7 @@ from nonebot.rule import to_me
 
 import yaml
 import sys
-import db
+from db import check_song_exists
 
 sys.path.insert(0, "/home/admin/Sources/nonebot/nonebot.venv/lib/python3.12/site-packages")
 
@@ -96,7 +96,7 @@ async def handle_to_me(bot: Bot, event: Event, msg: Message = EventMessage()):
     if plain_text == "help":
         await bot.send(event=event, message="不帮助。")
         return
-    if db.check_song_exists(plain_text):
+    if check_song_exists(plain_text):
         await bot.send(event=event, message="有这首歌。")
     else:
         await bot.send(event=event, message="没有这首歌。")
