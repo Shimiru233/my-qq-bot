@@ -1,0 +1,1048 @@
+# Chinese (Simplified, China) translations for nb-cli.
+# Copyright (C) 2023 ORGANIZATION
+# This file is distributed under the same license as the nb-cli project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2023.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: nb-cli 1.0.0\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-01-24 13:57+0000\n"
+"PO-Revision-Date: 2023-01-11 08:56+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_Hans_CN\n"
+"Language-Team: zh_Hans_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: nb_cli/cli/__init__.py:23
+msgid "Are you sure to exit NB CLI?"
+msgstr "你确定要退出 NB CLI 吗?"
+
+#: nb_cli/cli/__init__.py:65
+msgid "The working directory."
+msgstr "工作目录."
+
+#: nb_cli/cli/__init__.py:75
+msgid "Python executable path."
+msgstr "Python 可执行文件路径."
+
+#: nb_cli/cli/__init__.py:83
+msgid "Auto detect virtual environment."
+msgstr "自动检测虚拟环境."
+
+#: nb_cli/cli/__init__.py:106 nb_cli/cli/commands/adapter.py:45
+#: nb_cli/cli/commands/cache.py:42 nb_cli/cli/commands/driver.py:38
+#: nb_cli/cli/commands/plugin.py:45 nb_cli/cli/commands/self.py:42
+#, python-brace-format
+msgid "Run subcommand {sub_cmd.name!r}"
+msgstr "运行子命令 {sub_cmd.name!r}"
+
+#: nb_cli/cli/__init__.py:110 nb_cli/cli/commands/adapter.py:52
+#: nb_cli/cli/commands/cache.py:49 nb_cli/cli/commands/driver.py:45
+#: nb_cli/cli/commands/plugin.py:52 nb_cli/cli/commands/self.py:49
+msgid "Exit NB CLI."
+msgstr "退出 NB CLI."
+
+#: nb_cli/cli/__init__.py:115
+msgid "Welcome to NoneBot CLI!"
+msgstr "欢迎使用 NoneBot CLI!"
+
+#: nb_cli/cli/__init__.py:121 nb_cli/cli/commands/adapter.py:58
+#: nb_cli/cli/commands/cache.py:55 nb_cli/cli/commands/driver.py:51
+#: nb_cli/cli/commands/plugin.py:58 nb_cli/cli/commands/self.py:55
+msgid "What do you want to do?"
+msgstr "你想要进行什么操作?"
+
+#: nb_cli/cli/customize.py:112
+#, python-brace-format
+msgid "Run script {script_name!r}"
+msgstr "运行脚本 {script_name!r}"
+
+#: nb_cli/cli/utils.py:105
+#, python-brace-format
+msgid "Package {name} not found."
+msgstr "包 {name} 未找到."
+
+#: nb_cli/cli/utils.py:107
+msgid "*** You may check with `--include-unpublished` option if supported."
+msgstr "*** 可以对支持的命令使用 `--include-unpublished` 选项来确认."
+
+#: nb_cli/cli/commands/adapter.py:29
+msgid "Manage bot adapters."
+msgstr "管理 bot 适配器."
+
+#: nb_cli/cli/commands/adapter.py:50 nb_cli/cli/commands/cache.py:47
+#: nb_cli/cli/commands/driver.py:43 nb_cli/cli/commands/plugin.py:50
+#: nb_cli/cli/commands/self.py:47
+msgid "Back to top level."
+msgstr "返回上一级."
+
+#: nb_cli/cli/commands/adapter.py:70
+msgid "Open nonebot adapter store."
+msgstr "打开 NoneBot 适配器商店."
+
+#: nb_cli/cli/commands/adapter.py:77
+msgid "NB-CLI - NoneBot Adapter Store"
+msgstr "NB-CLI - NoneBot 适配器商店"
+
+#: nb_cli/cli/commands/adapter.py:82
+msgid "List nonebot adapters published on nonebot homepage."
+msgstr "列出 NoneBot 官网上发布的适配器."
+
+#: nb_cli/cli/commands/adapter.py:89
+msgid "Whether to list installed adapters only in current project."
+msgstr "是否只列出安装到当前项目的适配器."
+
+#: nb_cli/cli/commands/adapter.py:96 nb_cli/cli/commands/adapter.py:116
+#: nb_cli/cli/commands/adapter.py:144 nb_cli/cli/commands/adapter.py:241
+msgid "Whether to include unpublished adapters."
+msgstr "是否要包含已下架的适配器."
+
+#: nb_cli/cli/commands/adapter.py:106 nb_cli/cli/commands/adapter.py:127
+msgid "WARNING: Unpublished adapters may be included."
+msgstr "警告: 结果中可能含有已下架的适配器."
+
+#: nb_cli/cli/commands/adapter.py:110
+msgid "Search for nonebot adapters published on nonebot homepage."
+msgstr "搜索 NoneBot 官网上发布的适配器."
+
+#: nb_cli/cli/commands/adapter.py:122
+msgid "Adapter name to search:"
+msgstr "想要搜索的适配器名称:"
+
+#: nb_cli/cli/commands/adapter.py:134
+msgid "Install nonebot adapter to current project."
+msgstr "安装适配器到当前项目."
+
+#: nb_cli/cli/commands/adapter.py:170 nb_cli/cli/commands/adapter.py:179
+msgid "Adapter name to install:"
+msgstr "想要安装的适配器名称:"
+
+#: nb_cli/cli/commands/adapter.py:194
+msgid "No available adapter found to install."
+msgstr "没有可供安装的适配器."
+
+#: nb_cli/cli/commands/adapter.py:200 nb_cli/cli/commands/adapter.py:266
+msgid ""
+"WARNING: Unpublished adapters may be installed. These adapters may be "
+"unmaintained or unusable."
+msgstr "警告: 有可能安装已下架的适配器. 其可能缺少维护或不可用."
+
+#: nb_cli/cli/commands/adapter.py:215
+#, python-brace-format
+msgid ""
+"Errors occurred in installing adapter {adapter.name}\n"
+"*** Try `nb adapter install` command with `--no-restrict-version` option "
+"to resolve under loose version constraints may work."
+msgstr ""
+"安装适配器 {adapter.name} 时发生错误\n"
+"*** 尝试使用 `--no-restrict-version` 选项执行 `nb adapter install` "
+"命令在宽松的版本约束下解析依赖可能可以解决此问题."
+
+#: nb_cli/cli/commands/adapter.py:227
+#, python-brace-format
+msgid "Failed to add adapter {adapter.name} to config: {e}"
+msgstr "添加适配器 {adapter.name} 到配置文件失败: {e}"
+
+#: nb_cli/cli/commands/adapter.py:234
+msgid "Update nonebot adapter."
+msgstr "更新适配器."
+
+#: nb_cli/cli/commands/adapter.py:253
+msgid "Adapter name to update:"
+msgstr "想要更新的适配器名称:"
+
+#: nb_cli/cli/commands/adapter.py:260
+msgid "No installed adapter found to update."
+msgstr "没有可供更新的适配器:"
+
+#: nb_cli/cli/commands/adapter.py:280
+#, python-brace-format
+msgid "Errors occurred in updating adapter {adapter.name}. Aborted."
+msgstr "更新适配器 {adapter.name} 时发生错误. 已中止."
+
+#: nb_cli/cli/commands/adapter.py:291
+msgid "Uninstall nonebot adapter from current project."
+msgstr "移除当前项目中的适配器."
+
+#: nb_cli/cli/commands/adapter.py:304
+msgid "Adapter name to uninstall:"
+msgstr "想要移除的适配器名称:"
+
+#: nb_cli/cli/commands/adapter.py:311
+msgid "No installed adapter found to uninstall."
+msgstr "没有可供移除的适配器."
+
+#: nb_cli/cli/commands/adapter.py:318
+#, python-brace-format
+msgid "Failed to remove adapter {adapter.name} from config: {e}"
+msgstr "从配置文件移除适配器 {adapter.name} 失败: {e}"
+
+#: nb_cli/cli/commands/adapter.py:332
+msgid "Create a new nonebot adapter."
+msgstr "新建适配器"
+
+#: nb_cli/cli/commands/adapter.py:340
+msgid "The adapter template to use."
+msgstr "使用的适配器模板."
+
+#: nb_cli/cli/commands/adapter.py:351
+msgid "Adapter name:"
+msgstr "适配器名称:"
+
+#: nb_cli/cli/commands/adapter.py:372
+msgid "Where to store the adapter?"
+msgstr "请输入适配器存储的位置:"
+
+#: nb_cli/cli/commands/adapter.py:373 nb_cli/cli/commands/adapter.py:376
+#: nb_cli/cli/commands/plugin.py:374 nb_cli/cli/commands/plugin.py:377
+msgid "Other"
+msgstr "其他"
+
+#: nb_cli/cli/commands/adapter.py:378 nb_cli/cli/commands/adapter.py:387
+#: nb_cli/cli/commands/plugin.py:379 nb_cli/cli/commands/plugin.py:389
+msgid "Output Dir:"
+msgstr "输出目录:"
+
+#: nb_cli/cli/commands/adapter.py:384 nb_cli/cli/commands/plugin.py:386
+msgid "Output dir is not a directory!"
+msgstr "输出目录不是一个文件夹!"
+
+#: nb_cli/cli/commands/adapter.py:389 nb_cli/cli/commands/plugin.py:381
+#: nb_cli/cli/commands/plugin.py:391
+msgid "Invalid output dir!"
+msgstr "无效的输出目录!"
+
+#: nb_cli/cli/commands/cache.py:26
+msgid "Manage CLI data caches."
+msgstr "管理 CLI 数据缓存."
+
+#: nb_cli/cli/commands/cache.py:78
+msgid "Show current usage of caches."
+msgstr "展示当前缓存使用情况."
+
+#: nb_cli/cli/commands/cache.py:84
+msgid "Show sizes under 1000-based SI units."
+msgstr "使用 1000 进制的 SI 单位 (KB/MB/GB/...) 显示大小."
+
+#: nb_cli/cli/commands/cache.py:89
+#, python-brace-format
+msgid "Cache location: {cache_dir}"
+msgstr "缓存位置: {cache_dir}"
+
+#: nb_cli/cli/commands/cache.py:127
+msgid "Module Type     Current         Unpublished     Total"
+msgstr "模块类型        当前            已下架          总计"
+
+#: nb_cli/cli/commands/cache.py:130
+#, python-brace-format
+msgid ""
+"Adapter         {adapter_current:<15} {adapter_unpublished:<15} "
+"{adapter_total:<15}"
+msgstr ""
+"适配器          {adapter_current:<15} {adapter_unpublished:<15} "
+"{adapter_total:<15}"
+
+#: nb_cli/cli/commands/cache.py:140
+#, python-brace-format
+msgid ""
+"Driver          {driver_current:<15} {driver_unpublished:<15} "
+"{driver_total:<15}"
+msgstr ""
+"驱动器          {driver_current:<15} {driver_unpublished:<15} "
+"{driver_total:<15}"
+
+#: nb_cli/cli/commands/cache.py:150
+#, python-brace-format
+msgid ""
+"Plugin          {plugin_current:<15} {plugin_unpublished:<15} "
+"{plugin_total:<15}"
+msgstr ""
+"插件            {plugin_current:<15} {plugin_unpublished:<15} "
+"{plugin_total:<15}"
+
+#: nb_cli/cli/commands/cache.py:160
+#, python-brace-format
+msgid ""
+"(Total)         {total_current:<15} {total_unpublished:<15} "
+"{total_total:<15}"
+msgstr ""
+"(总计)          {total_current:<15} {total_unpublished:<15} "
+"{total_total:<15}"
+
+#: nb_cli/cli/commands/cache.py:175
+#, python-brace-format
+msgid "ERROR: Failed to update data cache for module {module_type}."
+msgstr "错误: {module_type} 模块类型数据缓存更新失败."
+
+#: nb_cli/cli/commands/cache.py:182
+#, python-brace-format
+msgid "Successfully updated data cache for module {module_type}."
+msgstr "成功更新 {module_type} 模块类型的数据缓存."
+
+#: nb_cli/cli/commands/cache.py:188
+msgid "Update local cache."
+msgstr "更新本地缓存."
+
+#: nb_cli/cli/commands/cache.py:200
+#, python-brace-format
+msgid "ERROR: Invalid module type: {module_type}"
+msgstr "错误: 无效的模块类型: {module_type}"
+
+#: nb_cli/cli/commands/cache.py:209
+msgid "Update local cache for adapters."
+msgstr "更新适配器信息本地缓存."
+
+#: nb_cli/cli/commands/cache.py:216
+msgid "Update local cache for plugins."
+msgstr "更新插件信息本地缓存."
+
+#: nb_cli/cli/commands/cache.py:223
+msgid "Update local cache for drivers."
+msgstr "更新驱动器信息本地缓存."
+
+#: nb_cli/cli/commands/cache.py:231
+msgid "Clear local caches of unpublished modules."
+msgstr "清除已下架模块的本地缓存."
+
+#: nb_cli/cli/commands/cache.py:239 nb_cli/cli/commands/cache.py:261
+msgid "Clear caches without confirm."
+msgstr "不再次确认，直接清除缓存."
+
+#: nb_cli/cli/commands/cache.py:247
+msgid "Clear local caches."
+msgstr "清除本地缓存."
+
+#: nb_cli/cli/commands/cache.py:253
+msgid "Only clear caches for unpublished module types."
+msgstr "仅清除已下架模块缓存."
+
+#: nb_cli/cli/commands/cache.py:267
+msgid "Are you sure to clear these caches?"
+msgstr "你确定要清除这些缓存吗?"
+
+#: nb_cli/cli/commands/cache.py:283
+msgid "Successfully cleared unpublished caches."
+msgstr "成功清除已下架模块缓存."
+
+#: nb_cli/cli/commands/cache.py:294
+msgid "Successfully cleared all caches."
+msgstr "成功清除所有缓存."
+
+#: nb_cli/cli/commands/driver.py:22
+msgid "Manage bot driver."
+msgstr "管理 bot 驱动器."
+
+#: nb_cli/cli/commands/driver.py:63
+msgid "Open nonebot driver store."
+msgstr "打开 NoneBot 驱动器商店."
+
+#: nb_cli/cli/commands/driver.py:70
+msgid "NB-CLI - NoneBot Driver Store"
+msgstr "NB-CLI - NoneBot 驱动器商店"
+
+#: nb_cli/cli/commands/driver.py:75
+msgid "List nonebot drivers published on nonebot homepage."
+msgstr "列出 NoneBot 官网上发布的驱动器."
+
+#: nb_cli/cli/commands/driver.py:82 nb_cli/cli/commands/driver.py:98
+#: nb_cli/cli/commands/driver.py:123 nb_cli/cli/commands/driver.py:176
+msgid "Whether to include unpublished drivers."
+msgstr "是否要包含已下架的驱动器."
+
+#: nb_cli/cli/commands/driver.py:88 nb_cli/cli/commands/driver.py:109
+msgid "WARNING: Unpublished drivers may be included."
+msgstr "警告: 结果中可能含有已下架的驱动器."
+
+#: nb_cli/cli/commands/driver.py:92
+msgid "Search for nonebot drivers published on nonebot homepage."
+msgstr "搜索 NoneBot 官网上发布的驱动器."
+
+#: nb_cli/cli/commands/driver.py:104
+msgid "Driver name to search:"
+msgstr "想要搜索的驱动器名称:"
+
+#: nb_cli/cli/commands/driver.py:116
+msgid "Install nonebot driver to current project."
+msgstr "安装驱动器到当前项目."
+
+#: nb_cli/cli/commands/driver.py:135
+msgid "Driver name to install:"
+msgstr "想要安装的驱动器名称:"
+
+#: nb_cli/cli/commands/driver.py:146 nb_cli/cli/commands/driver.py:198
+msgid ""
+"WARNING: Unpublished drivers may be installed. These drivers may be "
+"unmaintained or unusable."
+msgstr "警告: 有可能安装已下架的驱动器. 其可能缺少维护或不可用."
+
+#: nb_cli/cli/commands/driver.py:160
+#, python-brace-format
+msgid "Errors occurred in installing driver {driver.name}. Aborted."
+msgstr "安装驱动器 {driver.name} 时发生错误. 已中止."
+
+#: nb_cli/cli/commands/driver.py:169
+msgid "Update nonebot driver."
+msgstr "更新驱动器."
+
+#: nb_cli/cli/commands/driver.py:188
+msgid "Driver name to update:"
+msgstr "想要更新的驱动器名称:"
+
+#: nb_cli/cli/commands/driver.py:212
+#, python-brace-format
+msgid "Errors occurred in updating driver {driver.name}. Aborted."
+msgstr "更新驱动器 {driver.name} 时发生错误. 已中止."
+
+#: nb_cli/cli/commands/driver.py:223
+msgid "Uninstall nonebot driver from current project."
+msgstr "移除当前项目中的驱动器."
+
+#: nb_cli/cli/commands/driver.py:231
+msgid "Driver name to uninstall:"
+msgstr "想要移除的驱动器名称:"
+
+#: nb_cli/cli/commands/plugin.py:29
+msgid "Manage bot plugins."
+msgstr "管理 bot 插件."
+
+#: nb_cli/cli/commands/plugin.py:70
+msgid "Open nonebot plugin store."
+msgstr "打开 NoneBot 插件商店."
+
+#: nb_cli/cli/commands/plugin.py:77
+msgid "NB-CLI - NoneBot Plugin Store"
+msgstr "NB-CLI - NoneBot 插件商店"
+
+#: nb_cli/cli/commands/plugin.py:82
+msgid "List nonebot plugins published on nonebot homepage."
+msgstr "列出 NoneBot 官网上发布的插件."
+
+#: nb_cli/cli/commands/plugin.py:89
+msgid "Whether to list installed plugins only in current project."
+msgstr "是否只列出安装到当前项目的插件."
+
+#: nb_cli/cli/commands/plugin.py:96 nb_cli/cli/commands/plugin.py:116
+#: nb_cli/cli/commands/plugin.py:144 nb_cli/cli/commands/plugin.py:239
+msgid "Whether to include unpublished plugins."
+msgstr "是否要包含已下架的插件."
+
+#: nb_cli/cli/commands/plugin.py:106 nb_cli/cli/commands/plugin.py:127
+msgid "WARNING: Unpublished plugins may be included."
+msgstr "警告: 结果中可能含有已下架的插件."
+
+#: nb_cli/cli/commands/plugin.py:110
+msgid "Search for nonebot plugins published on nonebot homepage."
+msgstr "搜索 NoneBot 官网上发布的插件."
+
+#: nb_cli/cli/commands/plugin.py:122
+msgid "Plugin name to search:"
+msgstr "想要搜索的插件名称:"
+
+#: nb_cli/cli/commands/plugin.py:134
+msgid "Install nonebot plugin to current project."
+msgstr "安装插件到当前项目."
+
+#: nb_cli/cli/commands/plugin.py:170 nb_cli/cli/commands/plugin.py:179
+msgid "Plugin name to install:"
+msgstr "想要安装的插件名称:"
+
+#: nb_cli/cli/commands/plugin.py:192
+msgid "No available plugin found to install."
+msgstr "没有可供安装的插件."
+
+#: nb_cli/cli/commands/plugin.py:198 nb_cli/cli/commands/plugin.py:264
+msgid ""
+"WARNING: Unpublished plugins may be installed. These plugins may be "
+"unmaintained or unusable."
+msgstr "警告: 有可能安装已下架的插件. 其可能缺少维护或不可用."
+
+#: nb_cli/cli/commands/plugin.py:213
+#, python-brace-format
+msgid ""
+"Errors occurred in installing plugin {plugin.name}\n"
+"*** Try `nb plugin install` command with `--no-restrict-version` option "
+"to resolve under loose version constraints may work."
+msgstr ""
+"安装插件 {adapter.name} 时发生错误\n"
+"*** 尝试使用 `--no-restrict-version` 选项执行 `nb plugin install` "
+"命令在宽松的版本约束下解析依赖可能可以解决此问题."
+
+#: nb_cli/cli/commands/plugin.py:225
+#, python-brace-format
+msgid "Failed to add plugin {plugin.name} to config: {e}"
+msgstr "添加插件 {plugin.name} 到配置文件失败: {e}"
+
+#: nb_cli/cli/commands/plugin.py:232
+msgid "Update nonebot plugin."
+msgstr "更新插件."
+
+#: nb_cli/cli/commands/plugin.py:251
+msgid "Plugin name to update:"
+msgstr "想要更新的插件名称:"
+
+#: nb_cli/cli/commands/plugin.py:258
+msgid "No installed plugin found to update."
+msgstr "没有可供更新的插件:"
+
+#: nb_cli/cli/commands/plugin.py:275
+#, python-brace-format
+msgid "Errors occurred in updating plugin {plugin.name}. Aborted."
+msgstr "更新插件 {plugin.name} 时发生错误. 已中止."
+
+#: nb_cli/cli/commands/plugin.py:286
+msgid "Uninstall nonebot plugin from current project."
+msgstr "移除当前项目中的插件."
+
+#: nb_cli/cli/commands/plugin.py:299
+msgid "Plugin name to uninstall:"
+msgstr "想要移除的插件名称:"
+
+#: nb_cli/cli/commands/plugin.py:306
+msgid "No installed plugin found to uninstall."
+msgstr "没有可供移除的插件."
+
+#: nb_cli/cli/commands/plugin.py:313
+#, python-brace-format
+msgid "Failed to remove plugin {plugin.name} from config: {e}"
+msgstr "从配置文件中移除插件 {plugin.name} 失败: {e}"
+
+#: nb_cli/cli/commands/plugin.py:327
+msgid "Create a new nonebot plugin."
+msgstr "创建一个新的插件."
+
+#: nb_cli/cli/commands/plugin.py:336
+msgid "The plugin template to use."
+msgstr "使用的插件模板."
+
+#: nb_cli/cli/commands/plugin.py:348
+msgid "Plugin name:"
+msgstr "插件名称:"
+
+#: nb_cli/cli/commands/plugin.py:356
+msgid "Use nested plugin?"
+msgstr "使用嵌套插件?"
+
+#: nb_cli/cli/commands/plugin.py:373 nb_cli/cli/commands/project.py:246
+msgid "Where to store the plugin?"
+msgstr "请输入插件存储位置:"
+
+#: nb_cli/cli/commands/project.py:56
+msgid "bootstrap (for beginner or user)"
+msgstr "bootstrap (初学者或用户)"
+
+#: nb_cli/cli/commands/project.py:57
+msgid "simple (for plugin developer)"
+msgstr "simple (插件开发者)"
+
+#: nb_cli/cli/commands/project.py:105
+msgid "Loading adapters..."
+msgstr "正在加载适配器..."
+
+#: nb_cli/cli/commands/project.py:107
+msgid "Loading drivers..."
+msgstr "正在加载驱动器..."
+
+#: nb_cli/cli/commands/project.py:111
+msgid "Project Name:"
+msgstr "项目名称:"
+
+#: nb_cli/cli/commands/project.py:113 nb_cli/cli/commands/project.py:121
+msgid "Invalid project name!"
+msgstr "无效的项目名称!"
+
+#: nb_cli/cli/commands/project.py:128
+msgid "Current folder is not empty. Overwrite existing files?"
+msgstr "当前文件夹非空，是否要覆盖现有文件?"
+
+#: nb_cli/cli/commands/project.py:131
+msgid "Stopped creating bot."
+msgstr "停止创建机器人."
+
+#: nb_cli/cli/commands/project.py:140
+msgid "Which adapter(s) would you like to use?"
+msgstr "要使用哪些适配器?"
+
+#: nb_cli/cli/commands/project.py:150
+msgid "You haven't chosen any adapter! Please confirm."
+msgstr "你没有选择任何适配器! 请确认."
+
+#: nb_cli/cli/commands/project.py:164
+msgid "Which driver(s) would you like to use?"
+msgstr "要使用哪些驱动器?"
+
+#: nb_cli/cli/commands/project.py:172
+msgid "Chosen drivers is not valid!"
+msgstr "选择的驱动器不合法!"
+
+#: nb_cli/cli/commands/project.py:186
+msgid "User global (default, suitable for single instance in single user)"
+msgstr "用户全局 (默认, 适用于单用户下单实例)"
+
+#: nb_cli/cli/commands/project.py:187
+msgid "Current project (suitable for multiple/portable instances)"
+msgstr "当前项目 (适用于多实例/便携实例)"
+
+#: nb_cli/cli/commands/project.py:189
+msgid ""
+"User global (isolate by project name, suitable for multiple instances in "
+"single user)"
+msgstr "用户全局 (按项目名称隔离, 适用于单用户下多实例)"
+
+#: nb_cli/cli/commands/project.py:192
+msgid "Custom storage location (for advanced users)"
+msgstr "自定义存储位置 (高级用户)"
+
+#: nb_cli/cli/commands/project.py:197
+msgid "Which strategy of local storage would you like to use?"
+msgstr "要使用什么本地存储策略?"
+
+#: nb_cli/cli/commands/project.py:220
+msgid "Cache directory to use:"
+msgstr "要使用的缓存目录:"
+
+#: nb_cli/cli/commands/project.py:225
+msgid "Data directory to use:"
+msgstr "要使用的数据目录:"
+
+#: nb_cli/cli/commands/project.py:230
+msgid "Config directory to use:"
+msgstr "要使用的配置目录:"
+
+#: nb_cli/cli/commands/project.py:242
+#, python-brace-format
+msgid "1) In a \"{dir_name}\" folder"
+msgstr "1) 在 \"{dir_name}\" 文件夹中"
+
+#: nb_cli/cli/commands/project.py:243
+msgid "2) In a \"src\" folder"
+msgstr "2) 在 \"src\" 文件夹中"
+
+#: nb_cli/cli/commands/project.py:253
+msgid "Which developer tool(s) would you like to use?"
+msgstr "要使用哪些开发工具?"
+
+#: nb_cli/cli/commands/project.py:255 nb_cli/cli/commands/project.py:256
+msgid " (Recommended)"
+msgstr " (推荐)"
+
+#: nb_cli/cli/commands/project.py:258
+msgid " (Advanced user)"
+msgstr " (高级用户)"
+
+#: nb_cli/cli/commands/project.py:263
+msgid "Cannot choose 'Pylance/Pyright' and 'BasedPyright' at the same time."
+msgstr "不能同时选择 'Pylance/Pyright' 和 'BasedPyright'."
+
+#: nb_cli/cli/commands/project.py:280
+msgid "Create a NoneBot project."
+msgstr "创建一个 NoneBot 项目."
+
+#: nb_cli/cli/commands/project.py:288
+msgid "The project template to use."
+msgstr "使用的项目模板."
+
+#: nb_cli/cli/commands/project.py:293
+msgid "The python interpreter virtualenv is installed into."
+msgstr "虚拟环境使用的 Python 解释器."
+
+#: nb_cli/cli/commands/project.py:310
+msgid "Select a template to use:"
+msgstr "选择一个要使用的模板:"
+
+#: nb_cli/cli/commands/project.py:332
+msgid "Install dependencies now?"
+msgstr "立即安装依赖?"
+
+#: nb_cli/cli/commands/project.py:347
+msgid "Which project manager would you like to use?"
+msgstr "要使用哪个项目管理器?"
+
+#: nb_cli/cli/commands/project.py:356
+msgid "Create virtual environment?"
+msgstr "创建虚拟环境?"
+
+#: nb_cli/cli/commands/project.py:365
+#, python-brace-format
+msgid "Creating virtual environment in {venv_dir} ..."
+msgstr "在 {venv_dir} 中创建虚拟环境..."
+
+#: nb_cli/cli/commands/project.py:390
+msgid ""
+"Failed to install dependencies! You should install the dependencies "
+"manually."
+msgstr "安装依赖失败! 请手动安装依赖."
+
+#: nb_cli/cli/commands/project.py:400
+msgid "Install developer dependencies?"
+msgstr "安装开发依赖?"
+
+#: nb_cli/cli/commands/project.py:412
+msgid "Failed to install developer dependencies! You may install them manually."
+msgstr "安装开发依赖失败! 可以手动安装依赖."
+
+#: nb_cli/cli/commands/project.py:425
+msgid "Which builtin plugin(s) would you like to use?"
+msgstr "要使用哪些内置插件?"
+
+#: nb_cli/cli/commands/project.py:435
+#, python-brace-format
+msgid "Failed to add builtin plugins {builtin_plugins} to config: {e}"
+msgstr "添加内置插件 {builtin_plugins} 到配置文件失败: {e}"
+
+#: nb_cli/cli/commands/project.py:447
+msgid "Which official plugins would you like to use?"
+msgstr "要使用哪些官方插件?"
+
+#: nb_cli/cli/commands/project.py:464
+msgid "Failed to install plugins! You may install the plugins manually."
+msgstr "安装插件失败! 可以手动安装插件."
+
+#: nb_cli/cli/commands/project.py:472
+msgid "Done!"
+msgstr "完成!"
+
+#: nb_cli/cli/commands/project.py:473
+msgid "Run the following command to start your bot:"
+msgstr "运行以下命令来启动你的机器人:"
+
+#: nb_cli/cli/commands/project.py:480
+msgid "Generate entry file of your bot."
+msgstr "生成机器人的入口文件."
+
+#: nb_cli/cli/commands/project.py:486
+msgid "The file script saved to."
+msgstr "脚本文件保存路径."
+
+#: nb_cli/cli/commands/project.py:495
+msgid "Run the bot in current folder."
+msgstr "在当前文件夹中运行机器人."
+
+#: nb_cli/cli/commands/project.py:502
+msgid "Exist entry file of your bot."
+msgstr "存在的机器人入口文件."
+
+#: nb_cli/cli/commands/project.py:509
+msgid "Reload the bot when file changed."
+msgstr "当文件发生变化时重新加载机器人."
+
+#: nb_cli/cli/commands/project.py:515
+msgid "Paths to watch for changes."
+msgstr "要监视变化的路径."
+
+#: nb_cli/cli/commands/project.py:521
+msgid "Files to watch for changes."
+msgstr "要监视变化的文件."
+
+#: nb_cli/cli/commands/project.py:527
+msgid "Files to ignore for changes."
+msgstr "要忽略变化的文件."
+
+#: nb_cli/cli/commands/project.py:534
+msgid "Delay time for reloading in seconds."
+msgstr "重新加载的延迟时间(秒)."
+
+#: nb_cli/cli/commands/project.py:567
+msgid "Upgrade the project format of your bot."
+msgstr "升级机器人的项目格式."
+
+#: nb_cli/cli/commands/project.py:572
+msgid "Are you sure to upgrade the project format?"
+msgstr "你确定要升级项目格式吗?"
+
+#: nb_cli/cli/commands/project.py:575
+msgid "Successfully upgraded project format."
+msgstr "成功升级项目格式."
+
+#: nb_cli/cli/commands/project.py:578
+msgid "Do you want to install missing dependencies?"
+msgstr "需要安装缺失的依赖吗?"
+
+#: nb_cli/cli/commands/project.py:586
+msgid "Downgrade the project format of your bot."
+msgstr "降级机器人的项目格式."
+
+#: nb_cli/cli/commands/project.py:591
+msgid "Are you sure to downgrade the project format?"
+msgstr "你确定要降级项目格式吗?"
+
+#: nb_cli/cli/commands/project.py:594
+msgid "Successfully downgraded project format."
+msgstr "成功降级项目格式."
+
+#: nb_cli/cli/commands/self.py:26
+msgid "Manage NB CLI."
+msgstr "管理 NB CLI."
+
+#: nb_cli/cli/commands/self.py:70
+msgid "Install package to cli venv."
+msgstr "在 cli 虚拟环境中安装包."
+
+#: nb_cli/cli/commands/self.py:79
+msgid "Package name you want to install?"
+msgstr "要安装的包名?"
+
+#: nb_cli/cli/commands/self.py:89
+msgid "Update cli self."
+msgstr "更新 cli."
+
+#: nb_cli/cli/commands/self.py:101
+msgid "Uninstall package from cli venv."
+msgstr "从 cli 虚拟环境中卸载包."
+
+#: nb_cli/cli/commands/self.py:110
+msgid "Package name you want to uninstall?"
+msgstr "要卸载的包名?"
+
+#: nb_cli/cli/commands/self.py:122
+msgid "List installed packages in cli venv."
+msgstr "列出 cli 虚拟环境中已安装的包."
+
+#: nb_cli/config/parser.py:169
+msgid "Invalid project config format."
+msgstr "无效的项目配置格式."
+
+#: nb_cli/config/parser.py:179
+#, python-brace-format
+msgid "Cannot find project root directory! {config_file} file not exists."
+msgstr "无法找到项目根目录! {config_file} 文件不存在."
+
+#: nb_cli/config/parser.py:220
+#, python-brace-format
+msgid "Using python: {python_path}"
+msgstr "使用 Python: {python_path}"
+
+#: nb_cli/config/parser.py:616
+msgid ""
+"WARNING: Legacy configuration format detected.\n"
+"*** Use `nb upgrade-format` to upgrade to the new format."
+msgstr ""
+"警告: 检测到旧的项目格式.\n"
+"*** 使用 `nb upgrade-format` 升级至新格式."
+
+#: nb_cli/handlers/environment.py:181
+#, python-brace-format
+msgid ""
+"Warning: The current project uses {current!r} but the available manager "
+"is {name!r}."
+msgstr "警告: 当前项目使用 {current!r} 但可用管理器为 {name!r}."
+
+#: nb_cli/handlers/meta.py:93
+msgid "Cannot find a valid Python interpreter."
+msgstr "无法找到可用的 Python 解释器."
+
+#: nb_cli/handlers/meta.py:134 nb_cli/handlers/meta.py:143
+msgid "Failed to get Python version."
+msgstr "获取 Python 版本失败."
+
+#: nb_cli/handlers/meta.py:135 nb_cli/handlers/meta.py:198
+#: nb_cli/handlers/meta.py:257
+#, python-brace-format
+msgid "Exit code {code}"
+msgstr "退出码 {code}"
+
+#: nb_cli/handlers/meta.py:162
+#, python-brace-format
+msgid "Python {major}.{minor} is not supported."
+msgstr "Python {major}.{minor} 不受支持."
+
+#: nb_cli/handlers/meta.py:197 nb_cli/handlers/meta.py:206
+msgid "Failed to get NoneBot version."
+msgstr "获取 NoneBot 版本失败."
+
+#: nb_cli/handlers/meta.py:224
+msgid "NoneBot is not installed."
+msgstr "NoneBot 未安装."
+
+#: nb_cli/handlers/meta.py:256 nb_cli/handlers/meta.py:265
+msgid "Failed to get pip version."
+msgstr "获取 pip 版本失败."
+
+#: nb_cli/handlers/meta.py:283
+msgid "pip is not installed."
+msgstr "pip 未安装."
+
+#: nb_cli/handlers/project.py:129
+msgid "Current format is already the new format."
+msgstr "当前格式已为新格式."
+
+#: nb_cli/handlers/project.py:149
+#, python-brace-format
+msgid "WARNING: Inconsistent adapter name info: {old!r} -> {new!r}"
+msgstr "警告: 适配器名称信息不一致: {old!r} -> {new!r}"
+
+#: nb_cli/handlers/project.py:186
+msgid "Current format is already the old format."
+msgstr "当前格式已为旧格式."
+
+#: nb_cli/handlers/reloader.py:126
+#, python-brace-format
+msgid "Watchfiles detected changes in {paths}. Reloading..."
+msgstr "Watchfiles 在 {paths} 中发现变化. 正在重新加载..."
+
+#: nb_cli/handlers/reloader.py:137
+#, python-brace-format
+msgid "Started reloader with process [{pid}]."
+msgstr "启动重载监视，当前进程 [{pid}]."
+
+#: nb_cli/handlers/reloader.py:149
+#, python-brace-format
+msgid "Restarted process [{pid}]."
+msgstr "重启进程 [{pid}]."
+
+#: nb_cli/handlers/reloader.py:158
+#, python-brace-format
+msgid "Shutting down process [{pid}]..."
+msgstr "正在终止进程 [{pid}]..."
+
+#: nb_cli/handlers/reloader.py:163
+msgid "Stopped reloader."
+msgstr "停止重载监视"
+
+#: nb_cli/handlers/store.py:22
+msgid "WARNING: Cache directory is unavailable."
+msgstr "警告: 缓存目录不可用."
+
+#: nb_cli/handlers/store.py:123 nb_cli/handlers/store.py:214
+#, python-brace-format
+msgid "Invalid module type: {module_type}"
+msgstr "无效的模块类型: {module_type}"
+
+#: nb_cli/handlers/store.py:159
+#, python-brace-format
+msgid "WARNING: Failed to cache data for module {module_type}."
+msgstr "警告: {module_type} 模块类型数据缓存失败."
+
+#: nb_cli/handlers/store.py:168
+#, python-brace-format
+msgid "WARNING: Failed to update unpublished data for module {module_type}."
+msgstr "警告: {module_type} 模块类型下架数据更新失败."
+
+#: nb_cli/handlers/store.py:178
+#, python-brace-format
+msgid "Failed to get {module_type} list."
+msgstr "获取 {module_type} 列表失败."
+
+#: nb_cli/handlers/store.py:229
+#, python-brace-format
+msgid "Invalid local cache of module type: {module_type}"
+msgstr "无效的模块类型缓存: {module_type}"
+
+#: nb_cli/handlers/store.py:265
+#, python-brace-format
+msgid ""
+"WARNING: Failed to download latest data of module {module_type}. Expired "
+"cache is used."
+msgstr "警告: 无法下载最新的 {module_type} 模块类型缓存. 当前正在使用旧的缓存."
+
+#: nb_cli/tui/card.py:29
+msgid "Unknown state"
+msgstr "未知状态"
+
+#: nb_cli/tui/card.py:30
+msgid "Plugin test passed"
+msgstr "插件测试通过"
+
+#: nb_cli/tui/card.py:31
+msgid "Plugin test failed"
+msgstr "插件测试失败"
+
+#: nb_cli/tui/card.py:33
+msgid "Plugin test skipped"
+msgstr "跳过插件测试"
+
+#: nb_cli/tui/card.py:68 nb_cli/tui/gallery.py:27
+msgid "Toggle dark mode"
+msgstr "切换暗色模式"
+
+#: nb_cli/tui/card.py:154 nb_cli/tui/card.py:269
+#, python-brace-format
+msgid "Author: {author}"
+msgstr "作者: {author}"
+
+#: nb_cli/tui/card.py:161
+msgid "Install"
+msgstr "安装"
+
+#: nb_cli/tui/card.py:174
+msgid "Latest version:"
+msgstr "最新版本"
+
+#: nb_cli/tui/card.py:178
+msgid "Package name:"
+msgstr "包名:"
+
+#: nb_cli/tui/card.py:181
+msgid "Module name:"
+msgstr "模块名称:"
+
+#: nb_cli/tui/card.py:183
+msgid "Recent update:"
+msgstr "最近更新:"
+
+#: nb_cli/tui/card.py:192
+msgid "Homepage"
+msgstr "主页"
+
+#: nb_cli/tui/card.py:230
+#, python-brace-format
+msgid "Successfully installed \"{name}\"."
+msgstr "成功安装 \"{name}\"."
+
+#: nb_cli/tui/card.py:264
+msgid "Initializing..."
+msgstr "初始化中..."
+
+#: nb_cli/tui/console.py:22
+msgid "Close"
+msgstr "关闭"
+
+#: nb_cli/tui/console.py:23
+msgid "Clear output"
+msgstr "清空输出"
+
+#: nb_cli/tui/console.py:24
+msgid "Cancel process"
+msgstr "取消进程"
+
+#: nb_cli/tui/console.py:25
+msgid "Terminate process"
+msgstr "终止进程"
+
+#: nb_cli/tui/console.py:26
+msgid "Copy content"
+msgstr "复制内容"
+
+#: nb_cli/tui/console.py:28
+msgid "Console output"
+msgstr "控制台输出"
+
+#: nb_cli/tui/console.py:64
+#, python-brace-format
+msgid "Process exited (code: {code}). Press ESC / q / Ctrl+C to close."
+msgstr "进程已退出 (状态码: {code}). 按 ESC / q / Ctrl+C 关闭."
+
+#: nb_cli/tui/console.py:76
+msgid "Cannot leave current console until the process is done or terminated."
+msgstr "进程结束或终止前无法离开当前控制台."
+
+#: nb_cli/tui/gallery.py:25
+msgid "Quit"
+msgstr "退出"
+
+#: nb_cli/tui/gallery.py:26
+msgid "Search"
+msgstr "搜索"
+
+#: nb_cli/tui/gallery.py:28
+msgid "Open console"
+msgstr "打开控制台"
+
+#: nb_cli/tui/gallery.py:61
+msgid "Search..."
+msgstr "搜索..."
+

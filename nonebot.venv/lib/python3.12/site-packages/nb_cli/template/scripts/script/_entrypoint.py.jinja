@@ -1,0 +1,9 @@
+{% macro get_entrypoints() %}
+import sys
+from importlib.metadata import entry_points
+
+if sys.version_info < (3, 10):
+    entrypoints = entry_points().get({{ ENTRYPOINT_GROUP|repr }}, ())
+else:
+    entrypoints = entry_points(group={{ ENTRYPOINT_GROUP|repr }})
+{% endmacro %}

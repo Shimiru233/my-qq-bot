@@ -1,0 +1,21 @@
+{% if cookiecutter.sub_plugin %}from pathlib import Path
+
+import nonebot
+{% endif %}from nonebot import get_plugin_config
+from nonebot.plugin import PluginMetadata
+
+from .config import Config
+
+__plugin_meta__ = PluginMetadata(
+    name="{{cookiecutter.plugin_name}}",
+    description="",
+    usage="",
+    config=Config,
+)
+
+config = get_plugin_config(Config)
+{% if cookiecutter.sub_plugin %}
+sub_plugins = nonebot.load_plugins(
+    str(Path(__file__).parent.joinpath("plugins").resolve())
+)
+{% endif %}
