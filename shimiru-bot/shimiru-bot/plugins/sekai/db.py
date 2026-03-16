@@ -1,11 +1,14 @@
 import psycopg2
 
-def check_song_exists(conn, keyword: str) -> bool:
-    """
-    arcaea_assets テーブルの name と alias(text[]) を曖昧検索
-    見つかったら True、なければ False
-    """
+conn = psycopg2.connect(
+    host="localhost",
+    port=5432,
+    database="testdb",
+    user="readonly_user",
+    password="password"
+)
 
+def check_song_exists(keyword: str) -> bool:
     sql = """
     SELECT 1
     FROM arcaea_assets

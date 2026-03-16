@@ -8,4 +8,10 @@
 
 ## Documentation
 
+## Arcace guess chart
+
+1.at qq group:send `gc` command to start
+2.match @robot message
+3.while true or time,send Chart message,while false do nothing
+
 See [Docs](https://nonebot.dev/)

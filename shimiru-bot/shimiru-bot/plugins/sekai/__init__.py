@@ -5,9 +5,12 @@ from nonebot import on_command
 from nonebot.params import EventMessage
 from .card_cache import get_assetbundle_name
 from nonebot.adapters.onebot.v11.exception import ActionFailed
+from nonebot.rule import to_me
+
 
 import yaml
 import sys
+import db
 
 sys.path.insert(0, "/home/admin/Sources/nonebot/nonebot.venv/lib/python3.12/site-packages")
 
@@ -15,7 +18,7 @@ import aiohttp
 from pathlib import Path
 
 
-
+busying = False
 
 CONFIG_PATH = Path(__file__).parent / "my_config.yaml"
 
@@ -24,9 +27,9 @@ with CONFIG_PATH.open("r", encoding="utf-8") as f:
 
 
 kardMatcher = on_startswith("kard", ignorecase=True)
-@kardMatcher.handle()
 
-async def handle_function(bot: Bot, event: Event, msg: Message = EventMessage()):
+@kardMatcher.handle_card()
+async def handle_card(bot: Bot, event: Event, msg: Message = EventMessage()):
     plain_text = msg.extract_plain_text().strip()
     parceled_card_id_str = plain_text.replace(" ", "")[4:]
 
@@ -57,10 +60,10 @@ async def handle_function(bot: Bot, event: Event, msg: Message = EventMessage())
         await bot.send(event=event, message=MessageSegment.image(url1))
 
 
-guessChartMatcher = on_command("gs", aliases={"猜图"}, ignorecase=True)
-@guessChartMatcher.handle()
+guessChartMatcher = on_command("gc", aliases={"猜图"}, ignorecase=True)
+@guessChartMatcher.handle_guess_chart()
 
-async def handle_function(bot: Bot, event: Event, msg: Message = EventMessage()):
+async def handle_guess_chart(bot: Bot, event: Event, msg: Message = EventMessage()):
     plain_text = msg.extract_plain_text().strip()
     parceled_card_id_str = plain_text.replace(" ", "")[2:]
 
@@ -83,4 +86,21 @@ async def handle_function(bot: Bot, event: Event, msg: Message = EventMessage())
         await bot.send(event=event, message="发送图片失败了。")
 
 
+to_meMatcher = to_me()
+@to_meMatcher.handle_to_me()
+async def handle_to_me(bot: Bot, event: Event, msg: Message = EventMessage()):
+    plain_text = msg.extract_plain_text().strip()
+    if busying:
+        await bot.send(event=event, message="忙不过来了。")
+        return
+    if plain_text == "help":
+        await bot.send(event=event, message="不帮助。")
+        return
+    if db.check_song_exists(plain_text):
+        await bot.send(event=event, message="有这首歌。")
+    else:
+        await bot.send(event=event, message="没有这首歌。")
+    
+    
 
+    
