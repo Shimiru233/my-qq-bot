@@ -13,8 +13,6 @@ from nonebot.rule import to_me
 import yaml
 import sys
 
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-from db import check_song_exists
 
 sys.path.insert(0, "/home/admin/Sources/nonebot/nonebot.venv/lib/python3.12/site-packages")
 
@@ -32,7 +30,7 @@ with CONFIG_PATH.open("r", encoding="utf-8") as f:
 
 kardMatcher = on_startswith("kard", ignorecase=True)
 
-@kardMatcher.handle_card()
+@kardMatcher.handle()
 async def handle_card(bot: Bot, event: Event, msg: Message = EventMessage()):
     plain_text = msg.extract_plain_text().strip()
     parceled_card_id_str = plain_text.replace(" ", "")[4:]
@@ -64,46 +62,8 @@ async def handle_card(bot: Bot, event: Event, msg: Message = EventMessage()):
         await bot.send(event=event, message=MessageSegment.image(url1))
 
 
-guessChartMatcher = on_command("gc", aliases={"猜图"}, ignorecase=True)
-@guessChartMatcher.handle_guess_chart()
-
-async def handle_guess_chart(bot: Bot, event: Event, msg: Message = EventMessage()):
-    plain_text = msg.extract_plain_text().strip()
-    parceled_card_id_str = plain_text.replace(" ", "")[2:]
-
-    try:
-        n = int(parceled_card_id_str)
-    except ValueError:
-        await bot.send(event=event, message="不知道。")
-        return
-
-    asset_name = get_assetbundle_name(n)
-    if not asset_name:
-        await bot.send(event=event, message="没找到这个卡。")
-        return
-
-    url = f"{data['asset_api_url'].rstrip('/')}/startapp/character/member/{asset_name}/card_guess.png"
-
-    try:
-        await bot.send(event=event, message=MessageSegment.image(url))
-    except ActionFailed:
-        await bot.send(event=event, message="发送图片失败了。")
 
 
-to_meMatcher = to_me()
-@to_meMatcher.handle_to_me()
-async def handle_to_me(bot: Bot, event: Event, msg: Message = EventMessage()):
-    plain_text = msg.extract_plain_text().strip()
-    if busying:
-        await bot.send(event=event, message="忙不过来了。")
-        return
-    if plain_text == "help":
-        await bot.send(event=event, message="不帮助。")
-        return
-    if check_song_exists(plain_text):
-        await bot.send(event=event, message="有这首歌。")
-    else:
-        await bot.send(event=event, message="没有这首歌。")
     
     
 
