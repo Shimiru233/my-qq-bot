@@ -1,1 +1,48 @@
-shimiru-bot\shimiru-bot\plugins\sekai\arcaea-assets
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*$py.class
+
+# ===== 虚拟环境 =====
+venv/
+.venv/
+env/
+ENV/
+
+# ===== 构建 / 打包 =====
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# ===== 日志 =====
+*.log
+
+# ===== 数据库 =====
+*.sqlite3
+db.sqlite3
+
+# ===== 环境变量 =====
+.env
+.env.*
+
+# ===== IDE / 编辑器 =====
+.vscode/
+.idea/
+
+# ===== 操作系统 =====
+.DS_Store
+Thumbs.db
+
+# ===== pytest =====
+.pytest_cache/
+
+# ===== mypy =====
+.mypy_cache/
+
+# ===== coverage =====
+.coverage
+htmlcov/
+
+# **/arcaea-assets/
+shimiru-bot/shimiru-bot/plugins/arcaea/arcaea-assets/
