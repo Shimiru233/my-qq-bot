@@ -95,13 +95,31 @@ def search_songs_sync(keyword: str) -> dict | None:
     try:
         with conn.cursor() as cur:
             sql = """
-            SELECT id, GREATEST(similarity(id, %s), similarity(title, %s), similarity(alias, %s)) AS sim
-            FROM m_alias
-            WHERE GREATEST(similarity(id, %s), similarity(title, %s), similarity(alias, %s)) > 0.4
-            ORDER BY sim DESC
-            LIMIT 1
-            """
-            cur.execute(sql, (keyword,) * 6)
+	        SELECT id, title,
+                       GREATEST(
+                           similarity(id, %s),
+                           similarity(title, %s),
+                           similarity(alias, %s)
+                       ) AS sim
+                FROM m_alias
+                WHERE
+                    id %% %s
+                    OR title ILIKE %s
+                    OR alias ILIKE %s
+                    OR alias %% %s
+                ORDER BY sim DESC
+                LIMIT 1
+                """
+
+            cur.execute(sql, (
+                keyword,          # similarity(id)
+                keyword,          # similarity(title)
+                keyword,          # similarity(alias)
+                keyword,          # id %%
+                f"%{keyword}%",   # title ILIKE
+                f"%{keyword}%",   # alias ILIKE
+                keyword           # alias %%
+            ))
             row = cur.fetchone()
             if not row:
                 return None
