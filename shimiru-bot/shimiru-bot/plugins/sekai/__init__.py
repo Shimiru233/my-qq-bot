@@ -129,13 +129,22 @@ async def handle_watch(bot: Bot, event: Event):
         await bot.send(event, f"该角色(ID:{char_id})暂无卡面数据。")
         return
 
-    suffix = random.choice(["card_normal.png", "card_after_training.png"])
-    url = f"{data['asset_api_url'].rstrip('/')}/startapp/character/member/{asset_name}/{suffix}"
+    # 方案：优先发普通图，如果失败了自动重试普通图
+    url_normal = f"{data['asset_api_url'].rstrip('/')}/startapp/character/member/{asset_name}/card_normal.png"
+    url_after = f"{data['asset_api_url'].rstrip('/')}/startapp/character/member/{asset_name}/card_after_training.png"
+
+    # 随机选一个尝试
+    target_url = random.choice([url_normal, url_after])
     
     try:
-        await bot.send(event, MessageSegment.image(url))
+        await bot.send(event, MessageSegment.image(target_url))
     except ActionFailed:
-        await bot.send(event, "图片发送失败。")
+        # 如果失败了（极大概率是因为选到了不存在的 after 图），降级发送 normal 图
+        if target_url == url_after:
+            try:
+                await bot.send(event, MessageSegment.image(url_normal))
+            except ActionFailed:
+                await bot.send(event, "该图片确实无法发送。")
 
 # 3. 别名管理指令
 aliasSetMatcher = on_command("setCharInfo")
