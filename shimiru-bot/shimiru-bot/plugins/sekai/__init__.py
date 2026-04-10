@@ -13,8 +13,7 @@ from anyio import to_thread
 from psycopg2 import pool
 
 # 引入之前修改好的 card_cache 逻辑
-from .card_cache import get_assetbundle_name
-
+from .card_cache import get_assetbundle_name, get_random_card_id_by_character
 # 环境路径配置
 sys.path.insert(0, "/home/admin/Sources/nonebot/nonebot.venv/lib/python3.12/site-packages")
 
@@ -44,19 +43,9 @@ def get_char_id_by_alias_exact(keyword: str) -> int | None:
     finally:
         db_pool.putconn(conn)
 
-def get_random_card_id_by_char(char_id: int) -> int | None:
-    """获取指定角色下的随机一张卡面 ID"""
-    conn = db_pool.getconn()
-    try:
-        with conn.cursor() as cur:
-            # 假设你的卡面表名为 m_card，角色字段为 character_id
-            cur.execute("SELECT id FROM m_card WHERE character_id = %s", (char_id,))
-            rows = cur.fetchall()
-            if not rows:
-                return None
-            return random.choice(rows)[0]
-    finally:
-        db_pool.putconn(conn)
+async def get_random_card_id_logic(char_id: int) -> int | None:
+    # 这一步直接在异步环境调用同步的缓存检索
+    return get_random_card_id_character(char_id)
 
 def modify_alias_db_exact(target: str, alias_val: str, mode: str):
     """精确匹配后添加或删除别名"""
@@ -121,24 +110,27 @@ watchMatcher = on_startswith("看")
 
 @watchMatcher.handle()
 async def handle_watch(bot: Bot, event: Event):
-    # 提取“看”后面的内容并去除空格
     char_name = event.get_plaintext().strip()[1:].strip()
     if not char_name:
         return
 
+    # 1. 依然通过数据库精确查找 charId
     char_id = await to_thread.run_sync(get_char_id_by_alias_exact, char_name)
     if not char_id:
         await bot.send(event, "没找到这个角色。")
         return
 
-    card_id = await to_thread.run_sync(get_random_card_id_by_char, char_id)
+    # 2. 【核心修改】从 JSON 缓存中随机取一个卡面 ID
+    card_id = get_random_card_id_by_character(char_id)
+    
+    # 3. 获取资源名
     asset_name = get_assetbundle_name(card_id) if card_id else None
     
     if not asset_name:
         await bot.send(event, "该角色暂无卡面数据。")
         return
 
-    # 随机返回一张（普通或觉醒）
+    # 4. 随机返回一张
     suffix = random.choice(["card_normal.png", "card_after_training.png"])
     url = f"{data['asset_api_url'].rstrip('/')}/startapp/character/member/{asset_name}/{suffix}"
     

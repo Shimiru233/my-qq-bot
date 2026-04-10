@@ -1,12 +1,14 @@
 import json
 from pathlib import Path
+import random
 
 # JSON 文件路径
 CARD_MAP_PATH = Path(__file__).parent / "card_map.json"
 
 # 全局缓存：key 为字符串格式的 id，value 为 assetbundleName
 CARD_MAP: dict[str, str] = {}
-
+# 新增：按 characterId 分组的缓存 { char_id: [card_id1, card_id2, ...] }
+CHAR_TO_CARDS: dict[int, list[int]] = {}
 
 def load_card_map() -> dict[str, str]:
     """从对象列表格式的 JSON 中加载数据到内存缓存"""
@@ -44,3 +46,8 @@ load_card_map()
 def get_assetbundle_name(card_id: int) -> str | None:
     """通过卡片 ID 获取对应的资源包名称"""
     return CARD_MAP.get(str(card_id))
+
+def get_random_card_id_by_character(char_id: int) -> int | None:
+    """从 JSON 缓存中按 characterId 随机抽取一个 card_id"""
+    card_ids = CHAR_TO_CARDS.get(char_id)
+    return random.choice(card_ids) if card_ids else None
