@@ -16,7 +16,7 @@ from psycopg2 import pool
 
 db_pool = pool.ThreadedConnectionPool(
     1, 5, host="localhost", database="arcaea_assets",
-    user="readonly_user", password="password"
+    user="common_user;", password="password"
 )
 
 COVERS_DIR = os.path.abspath("shimiru-bot/plugins/arcaea/arcaea-assets/covers")
