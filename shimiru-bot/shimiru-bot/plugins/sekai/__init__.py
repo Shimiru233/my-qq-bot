@@ -25,7 +25,7 @@ with CONFIG_PATH.open("r", encoding="utf-8") as f:
 
 # 假设与 Arcaea 使用同一个数据库实例，但表结构不同
 db_pool = pool.ThreadedConnectionPool(
-    1, 5, host="localhost", database="pjsk_assets",
+    1, 5, host="localhost", database="project_sekai_assets",
     user="common_user", password="password"
 )
 
