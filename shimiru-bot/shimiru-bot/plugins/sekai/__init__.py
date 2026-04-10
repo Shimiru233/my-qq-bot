@@ -138,7 +138,7 @@ async def handle_watch(bot: Bot, event: Event):
     card_id = get_random_card_id_by_character(char_id)
     
     # todo debug
-    await bot.send(event, card_id)  # 调试输出，确认 card_id 的值
+    await bot.send(event, str(card_id))  # 调试输出，确认 card_id 的值
     # 3. 获取资源名
     asset_name = get_assetbundle_name(card_id) if card_id else None
     
