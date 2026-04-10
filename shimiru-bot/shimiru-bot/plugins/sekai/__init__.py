@@ -114,6 +114,20 @@ async def handle_watch(bot: Bot, event: Event):
     if not char_name:
         return
 
+    # 1. 这里返回的是 int | None
+    char_id = await to_thread.run_sync(get_char_id_by_alias_exact, char_name)
+    
+    # 2. 显式检查：如果 char_id 为 None，直接返回并提示
+    if char_id is None:
+        await bot.send(event, "没找到这个角色。")
+        return
+
+    # 3. 此时类型检查器知道 char_id 必定是 int，不会再报错
+    card_id = get_random_card_id_by_character(char_id)
+    
+    if not char_name:
+        return
+
     # 1. 依然通过数据库精确查找 charId
     char_id = await to_thread.run_sync(get_char_id_by_alias_exact, char_name)
     if not char_id:

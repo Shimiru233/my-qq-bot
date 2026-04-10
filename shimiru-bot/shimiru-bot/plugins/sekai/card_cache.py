@@ -41,7 +41,7 @@ def load_card_map() -> dict[str, str]:
 
 # 模块导入时立刻加载
 load_card_map()
-
+print(f"成功加载角色卡面索引，共计 {len(CHAR_TO_CARDS)} 个角色")
 
 def get_assetbundle_name(card_id: int) -> str | None:
     """通过卡片 ID 获取对应的资源包名称"""
