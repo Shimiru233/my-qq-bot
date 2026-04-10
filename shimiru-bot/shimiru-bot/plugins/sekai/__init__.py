@@ -35,8 +35,8 @@ def get_char_id_by_alias_exact(keyword: str) -> int | None:
     conn = db_pool.getconn()
     try:
         with conn.cursor() as cur:
-            # 只做完全一致的查询
-            sql = "SELECT charId FROM char_alias WHERE alias = %s OR charId::text = %s LIMIT 1"
+            # 这里的列名必须是 charid (根据你的 \d 输出)
+            sql = "SELECT charid FROM char_alias WHERE alias = %s OR charid::text = %s LIMIT 1"
             cur.execute(sql, (keyword, keyword))
             row = cur.fetchone()
             return row[0] if row else None
@@ -48,22 +48,22 @@ async def get_random_card_id_logic(char_id: int) -> int | None:
     return get_random_card_id_by_character(char_id)
 
 def modify_alias_db_exact(target: str, alias_val: str, mode: str):
-    """精确匹配后添加或删除别名"""
+    """添加或删除别名"""
     conn = db_pool.getconn()
     try:
         with conn.cursor() as cur:
-            # 先找 ID
-            cur.execute("SELECT charId FROM char_alias WHERE alias = %s OR charId::text = %s LIMIT 1", (target, target))
+            # 同样将所有 charId 改为 charid
+            cur.execute("SELECT charid FROM char_alias WHERE alias = %s OR charid::text = %s LIMIT 1", (target, target))
             row = cur.fetchone()
             if not row:
                 return False, f"未找到角色: {target}"
             
             char_id = row[0]
             if mode == "add":
-                cur.execute("INSERT INTO char_alias (charId, alias) VALUES (%s, %s) ON CONFLICT DO NOTHING", (char_id, alias_val))
+                cur.execute("INSERT INTO char_alias (charid, alias) VALUES (%s, %s) ON CONFLICT DO NOTHING", (char_id, alias_val))
                 msg = f"已为角色 {char_id} 添加别名: {alias_val}"
             else:
-                cur.execute("DELETE FROM char_alias WHERE charId = %s AND alias = %s", (char_id, alias_val))
+                cur.execute("DELETE FROM char_alias WHERE charid = %s AND alias = %s", (char_id, alias_val))
                 msg = f"已删除角色 {char_id} 的别名: {alias_val}"
             
             conn.commit()
@@ -105,48 +105,30 @@ async def handle_card(bot: Bot, event: Event, msg: Message = EventMessage()):
     except ActionFailed:
         await bot.send(event=event, message=MessageSegment.image(url1))
 
-# 2. 看XX 指令 (根据名称随机查询)
+# 2. 看XX 指令 (已精简逻辑并修正字段)
 watchMatcher = on_startswith("看")
-
 @watchMatcher.handle()
 async def handle_watch(bot: Bot, event: Event):
     char_name = event.get_plaintext().strip()[1:].strip()
     if not char_name:
         return
 
-    # 1. 这里返回的是 int | None
+    # 步骤 2: 匹配 characterId (从数据库查)
     char_id = await to_thread.run_sync(get_char_id_by_alias_exact, char_name)
-    
-    # 2. 显式检查：如果 char_id 为 None，直接返回并提示
     if char_id is None:
         await bot.send(event, "没找到这个角色。")
         return
 
-    # 3. 此时类型检查器知道 char_id 必定是 int，不会再报错
+    # 步骤 3: 随机一张匹配的卡面 ID (从缓存取)
     card_id = get_random_card_id_by_character(char_id)
     
-    if not char_name:
-        return
-
-    # 1. 依然通过数据库精确查找 charId
-    char_id = await to_thread.run_sync(get_char_id_by_alias_exact, char_name)
-    if not char_id:
-        await bot.send(event, "没找到这个角色。")
-        return
-
-    # 2. 【核心修改】从 JSON 缓存中随机取一个卡面 ID
-    card_id = get_random_card_id_by_character(char_id)
-    
-    # todo debug
-    await bot.send(event, str(card_id))  # 调试输出，确认 card_id 的值
-    # 3. 获取资源名
+    # 步骤 4: 拿到 assetbundleName 并请求
     asset_name = get_assetbundle_name(card_id) if card_id else None
     
     if not asset_name:
-        await bot.send(event, "该角色暂无卡面数据。")
+        await bot.send(event, f"该角色(ID:{char_id})暂无卡面数据。")
         return
 
-    # 4. 随机返回一张
     suffix = random.choice(["card_normal.png", "card_after_training.png"])
     url = f"{data['asset_api_url'].rstrip('/')}/startapp/character/member/{asset_name}/{suffix}"
     
