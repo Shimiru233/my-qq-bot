@@ -26,7 +26,7 @@ with CONFIG_PATH.open("r", encoding="utf-8") as f:
 # 假设与 Arcaea 使用同一个数据库实例，但表结构不同
 db_pool = pool.ThreadedConnectionPool(
     1, 5, host="localhost", database="pjsk_assets",
-    user="common_user;", password="password"
+    user="common_user", password="password"
 )
 
 # ── 数据库同步辅助函数 (精确匹配) ──────────────────────
