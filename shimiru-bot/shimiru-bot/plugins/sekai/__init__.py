@@ -45,7 +45,7 @@ def get_char_id_by_alias_exact(keyword: str) -> int | None:
 
 async def get_random_card_id_logic(char_id: int) -> int | None:
     # 这一步直接在异步环境调用同步的缓存检索
-    return get_random_card_id_character(char_id)
+    return get_random_card_id_by_character(char_id)
 
 def modify_alias_db_exact(target: str, alias_val: str, mode: str):
     """精确匹配后添加或删除别名"""
