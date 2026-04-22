@@ -117,7 +117,7 @@ async def handle_watch(bot: Bot, event: Event):
         return
     
     if char_name is "大玉":
-        handle_watch_dayu()
+        await handle_watch_dayu(bot, event)
         return
     # 步骤 2: 匹配 characterId (从数据库查)
     char_id = await to_thread.run_sync(get_char_id_by_alias_exact, char_name)
