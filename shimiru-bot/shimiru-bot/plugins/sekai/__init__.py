@@ -122,7 +122,6 @@ async def handle_watch(bot: Bot, event: Event):
     # 步骤 2: 匹配 characterId (从数据库查)
     char_id = await to_thread.run_sync(get_char_id_by_alias_exact, char_name)
     if char_id is None:
-        await bot.send(event, "没找到这个角色。")
         return
 
     # 步骤 3: 随机一张匹配的卡面 ID (从缓存取)
