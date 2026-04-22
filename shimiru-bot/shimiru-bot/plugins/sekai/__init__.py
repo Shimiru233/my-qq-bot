@@ -22,7 +22,8 @@ CONFIG_PATH = Path(__file__).parent / "my_config.yaml"
 with CONFIG_PATH.open("r", encoding="utf-8") as f:
     data = yaml.safe_load(f)
     
-DAYU_DIR = Path(__file__).parent / "dayu_images"
+BASE_DIR = os.path.abspath("shimiru-bot/plugins/arcaea/arcaea-assets")
+DAYU_DIR = os.path.join(BASE_DIR, "dayu")
 
 HTTP_PORT = 18765
 
