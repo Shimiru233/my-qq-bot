@@ -21,6 +21,9 @@ sys.path.insert(0, "/home/admin/Sources/nonebot/nonebot.venv/lib/python3.12/site
 CONFIG_PATH = Path(__file__).parent / "my_config.yaml"
 with CONFIG_PATH.open("r", encoding="utf-8") as f:
     data = yaml.safe_load(f)
+    
+DAYU_DIR = Path(__file__).parent / "dayu_images"
+
 
 # 假设与 Arcaea 使用同一个数据库实例，但表结构不同
 db_pool = pool.ThreadedConnectionPool(
@@ -76,10 +79,10 @@ def modify_alias_db_exact(target: str, alias_val: str, mode: str):
 
 # ── 指令处理器 ──────────────────────────────────────
 
-# 1. kard 指令 (根据 ID 查询)
-kardMatcher = on_startswith("kard", ignorecase=True)
+# 1. card 指令 (根据 ID 查询)
+cardMatcher = on_startswith("card", ignorecase=True)
 
-@kardMatcher.handle()
+@cardMatcher.handle()
 async def handle_card(bot: Bot, event: Event, msg: Message = EventMessage()):
     plain_text = msg.extract_plain_text().strip()
     parceled_card_id_str = plain_text.replace(" ", "")[4:]
@@ -112,7 +115,10 @@ async def handle_watch(bot: Bot, event: Event):
     char_name = event.get_plaintext().strip()[1:].strip()
     if not char_name:
         return
-
+    
+    if char_name is "大玉":
+        handle_watch_dayu()
+        return
     # 步骤 2: 匹配 characterId (从数据库查)
     char_id = await to_thread.run_sync(get_char_id_by_alias_exact, char_name)
     if char_id is None:
@@ -164,3 +170,26 @@ async def handle_alias_edit(bot: Bot, event: Event, args: Message = CommandArg()
     
     success, result_msg = await to_thread.run_sync(modify_alias_db_exact, target, new_alias, mode)
     await bot.send(event, result_msg)
+    
+    
+async def handle_watch_dayu(bot: Bot, event: Event):
+    if not DAYU_DIR.exists():
+        await bot.send(event, "大玉文件夹不存在。")
+        return
+
+    images = [
+        p for p in DAYU_DIR.iterdir()
+        if p.suffix.lower() in [".jpg", ".jpeg", ".png", ".webp"]
+    ]
+
+    if not images:
+        await bot.send(event, "大玉文件夹是空的。")
+        return
+
+    img_path = random.choice(images)
+
+    try:
+        # 注意转成绝对路径更稳
+        await bot.send(event, MessageSegment.image(f"file:///{img_path.resolve()}"))
+    except ActionFailed:
+        await bot.send(event, "大玉发送失败。")
