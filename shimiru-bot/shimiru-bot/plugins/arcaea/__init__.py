@@ -19,7 +19,9 @@ db_pool = pool.ThreadedConnectionPool(
     user="common_user", password="password"
 )
 
-COVERS_DIR = os.path.abspath("shimiru-bot/plugins/arcaea/arcaea-assets/covers")
+BASE_DIR = os.path.abspath("shimiru-bot/plugins/arcaea/arcaea-assets")
+COVERS_DIR = os.path.join(BASE_DIR, "covers")
+DAYU_DIR = os.path.join(BASE_DIR, "dayu")
 HTTP_PORT = 18765
 
 # 全群游戏状态，key 为 group_id
@@ -39,7 +41,7 @@ def random_crop_quarter(input_path: str, output_path: str):
 
 
 def start_image_server():
-    handler = partial(SimpleHTTPRequestHandler, directory=COVERS_DIR)
+    handler = partial(SimpleHTTPRequestHandler, directory=BASE_DIR)
     server = HTTPServer(("127.0.0.1", HTTP_PORT), handler)
     print(f"[图片服务] 已启动: http://127.0.0.1:{HTTP_PORT}")
     server.serve_forever()

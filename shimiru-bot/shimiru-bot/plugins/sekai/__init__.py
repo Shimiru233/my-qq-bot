@@ -24,6 +24,9 @@ with CONFIG_PATH.open("r", encoding="utf-8") as f:
     
 DAYU_DIR = Path(__file__).parent / "dayu_images"
 
+HTTP_PORT = 18765
+
+
 
 # 假设与 Arcaea 使用同一个数据库实例，但表结构不同
 db_pool = pool.ThreadedConnectionPool(
@@ -116,7 +119,7 @@ async def handle_watch(bot: Bot, event: Event):
     if not char_name:
         return
     
-    if char_name is "大玉":
+    if char_name == "大玉":
         await handle_watch_dayu(bot, event)
         return
     # 步骤 2: 匹配 characterId (从数据库查)
@@ -172,6 +175,28 @@ async def handle_alias_edit(bot: Bot, event: Event, args: Message = CommandArg()
     
     
 async def handle_watch_dayu(bot: Bot, event: Event):
+    if not os.path.exists(DAYU_DIR):
+        await bot.send(event, "大玉文件夹不存在。")
+        return
+
+    images = [
+        f for f in os.listdir(DAYU_DIR)
+        if f.lower().endswith((".jpg", ".jpeg", ".png", ".webp"))
+    ]
+
+    if not images:
+        await bot.send(event, "大玉图库是空的。")
+        return
+
+    filename = random.choice(images)
+
+    # ⚠️ 用 HTTP，不要用本地路径
+    url = f"http://127.0.0.1:{HTTP_PORT}/dayu/{filename}"
+
+    try:
+        await bot.send(event, MessageSegment.image(url))
+    except ActionFailed:
+        await bot.send(event, "大玉发送失败。")
     if not DAYU_DIR.exists():
         await bot.send(event, "大玉文件夹不存在。")
         return
