@@ -14,6 +14,8 @@ from anyio import to_thread
 from psycopg2 import pool
 from openai import OpenAI
 import asyncio
+from nonebot import logger
+
 
 
 
@@ -261,7 +263,7 @@ client = OpenAI(\
     base_url="https://api.deepseek.com"
 )
 
-chatMatcher = on_message(rule=to_me())
+chatMatcher = on_message(rule=to_me(), priority=1)
 
 
 async def call_deepseek(message: str) -> str:
@@ -307,7 +309,7 @@ async def handle_chat(bot: Bot, event: Event, args: Message = CommandArg()):
     # 如果为空，说明是 @ 或特殊消息
     if not msg:
         msg = event.get_message().extract_plain_text().strip()
-
+        logger.info("Extracted plaintext from message: %s", msg)
     # 再兜底
     if not msg:
         msg = "……"
@@ -315,6 +317,7 @@ async def handle_chat(bot: Bot, event: Event, args: Message = CommandArg()):
     try:
         reply = await call_deepseek(msg)
         await bot.send(event, reply)
-        print("reply:", reply)
+        logger.info("reply: %s", reply)
     except Exception as e:
         await bot.send(event, "出错了")
+        logger.error("Error occurred while calling DeepSeek: %s", e)

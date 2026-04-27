@@ -14,6 +14,7 @@ from anyio import to_thread
 from PIL import Image
 from psycopg2 import pool
 
+
 db_pool = pool.ThreadedConnectionPool(
     1, 5, host="localhost", database="arcaea_assets",
     user="common_user", password="password"
@@ -257,7 +258,7 @@ async def search_song(bot: Bot, event: Event, args: Message = CommandArg()):
 
 
 # ── 猜歌回答监听 ─────────────────────────────────────
-to_meMatcher = on_message(rule=to_me())
+to_meMatcher = on_message(rule=to_me(), priority=10)
 
 
 @to_meMatcher.handle()
