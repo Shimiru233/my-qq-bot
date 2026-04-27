@@ -300,9 +300,7 @@ async def handle_chat(bot: Bot, event: Event, args: Message = CommandArg()):
     user_id = str(event.get_user_id())
 
     # 获取消息
-    msg = args.extract_plain_text().strip()
-    if not msg:
-        msg = str(event.get_message()).strip()
+    msg = event.get_plaintext().strip()
 
     if not msg:
         return
@@ -310,5 +308,6 @@ async def handle_chat(bot: Bot, event: Event, args: Message = CommandArg()):
     try:
         reply = await call_deepseek(msg)
         await bot.send(event, reply)
+        print("reply:", reply)
     except Exception as e:
         await bot.send(event, "出错了")
