@@ -298,7 +298,7 @@ async def call_deepseek(message: str) -> str:
 
 
 @chatMatcher.handle()
-async def handle_chat(bot: Bot, event: Event, args: Message = CommandArg()):
+async def handle_chat(bot: Bot, event: Event, args: Message = EventMessage()):
     # 获取用户ID（后面做记忆会用）
     user_id = str(event.get_user_id())
 
