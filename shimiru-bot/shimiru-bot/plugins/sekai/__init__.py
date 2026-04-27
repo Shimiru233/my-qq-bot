@@ -257,7 +257,6 @@ async def handle_watch_dayu(bot: Bot, event: Event):
 
 # ✅ 全局初始化（只执行一次）
 client = OpenAI(
-    api_key=os.environ.get("DEEPSEEK_API_KEY"),
     base_url="https://api.deepseek.com"
 )
 
