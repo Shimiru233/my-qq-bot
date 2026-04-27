@@ -301,10 +301,16 @@ async def handle_chat(bot: Bot, event: Event, args: Message = CommandArg()):
     user_id = str(event.get_user_id())
 
     # 获取消息
+
     msg = event.get_plaintext().strip()
 
+    # 如果为空，说明是 @ 或特殊消息
     if not msg:
-        return
+        msg = event.get_message().extract_plain_text().strip()
+
+    # 再兜底
+    if not msg:
+        msg = "……"
 
     try:
         reply = await call_deepseek(msg)
