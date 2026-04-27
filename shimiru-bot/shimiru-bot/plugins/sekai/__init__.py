@@ -252,8 +252,6 @@ async def handle_watch_dayu(bot: Bot, event: Event):
         await bot.send(event, MessageSegment.image(f"file:///{img_path.resolve()}"))
     except ActionFailed:
         await bot.send(event, "大玉发送失败。")
-<<<<<<< HEAD
-
 
 # 聊天机器人功能
 
@@ -315,5 +313,3 @@ async def handle_chat(bot: Bot, event: Event, args: Message = CommandArg()):
         await bot.send(event, reply)
     except Exception as e:
         await bot.send(event, "出错了")
-=======
->>>>>>> 361abf4 (feat:add look dayu)
