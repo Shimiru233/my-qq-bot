@@ -116,26 +116,26 @@ async def handle_card(bot: Bot, event: Event, msg: Message = EventMessage()):
     plain_text = msg.extract_plain_text().strip()
     parceled_card_id_str = plain_text.replace(" ", "")[4:]
 
-    try:
-        n = int(parceled_card_id_str)
-    except ValueError:
-        await bot.send(event=event, message="不知道。")
-        return
-
-    asset_name = get_assetbundle_name(n)
-    if not asset_name:
-        await bot.send(event=event, message="没找到这个卡。")
-        return
-
-    url1 = f"{data['asset_api_url'].rstrip('/')}/startapp/character/member/{asset_name}/card_normal.png"
-    url2 = f"{data['asset_api_url'].rstrip('/')}/startapp/character/member/{asset_name}/card_after_training.png"
-
-    msgs = MessageSegment.image(url1) + MessageSegment.image(url2)
-
-    try:
-        await bot.send(event=event, message=msgs)
-    except ActionFailed:
-        await bot.send(event=event, message=MessageSegment.image(url1))
+#    try:
+#        n = int(parceled_card_id_str)
+#    except ValueError:
+#        await bot.send(event=event, message="不知道。")
+#        return
+#
+#    asset_name = get_assetbundle_name(n)
+#    if not asset_name:
+#        await bot.send(event=event, message="没找到这个卡。")
+#        return
+#
+#    url1 = f"{data['asset_api_url'].rstrip('/')}/startapp/character/member/{asset_name}/card_normal.png"
+#    url2 = f"{data['asset_api_url'].rstrip('/')}/startapp/character/member/{asset_name}/card_after_training.png"
+#
+#    msgs = MessageSegment.image(url1) + MessageSegment.image(url2)
+#
+#    try:
+#        await bot.send(event=event, message=msgs)
+#    except ActionFailed:
+#        await bot.send(event=event, message=MessageSegment.image(url1))
 
 
 # 2. 看XX 指令 (已精简逻辑并修正字段)
@@ -252,6 +252,7 @@ async def handle_watch_dayu(bot: Bot, event: Event):
         await bot.send(event, MessageSegment.image(f"file:///{img_path.resolve()}"))
     except ActionFailed:
         await bot.send(event, "大玉发送失败。")
+<<<<<<< HEAD
 
 
 # 聊天机器人功能
@@ -314,3 +315,5 @@ async def handle_chat(bot: Bot, event: Event, args: Message = CommandArg()):
         await bot.send(event, reply)
     except Exception as e:
         await bot.send(event, "出错了")
+=======
+>>>>>>> 361abf4 (feat:add look dayu)

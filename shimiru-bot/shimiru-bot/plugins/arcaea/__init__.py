@@ -22,7 +22,7 @@ db_pool = pool.ThreadedConnectionPool(
 BASE_DIR = os.path.abspath("shimiru-bot/plugins/arcaea/arcaea-assets")
 COVERS_DIR = os.path.join(BASE_DIR, "covers")
 DAYU_DIR = os.path.join(BASE_DIR, "dayu")
-HTTP_PORT = 18765
+HTTP_PORT = 18766
 
 # 全群游戏状态，key 为 group_id
 game_states: dict[int, dict] = {}
