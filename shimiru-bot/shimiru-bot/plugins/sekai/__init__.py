@@ -277,14 +277,38 @@ client = OpenAI(\
 chatMatcher = on_message(rule=to_me(), priority=1)
 
 
-async def call_deepseek(message) -> str:
+async def call_deepseek(messages: list[dict]) -> str:
+    def sync_call(msgs):
+        safe_msgs = []
 
-    def sync_call(messages):
+        for m in msgs:
+            if not isinstance(m, dict):
+                continue
+
+            role = m.get("role")
+            content = m.get("content")
+
+            if role not in {"system", "user", "assistant"}:
+                continue
+
+            if not isinstance(content, str):
+                continue
+
+            safe_msgs.append({
+                "role": role,
+                "content": content
+            })
+
+        # 🔥 保底（防止空）
+        if not safe_msgs:
+            safe_msgs = [{"role": "user", "content": "……"}]
+
         resp = client.chat.completions.create(
             model="deepseek-v4-pro",
-            messages=messages,
+            messages=safe_msgs,
             stream=False
         )
+
         return resp.choices[0].message.content or "……"
 
     return await asyncio.to_thread(sync_call, messages)
@@ -355,6 +379,8 @@ async def handle_chat(bot: Bot, event: Event, args: Message = EventMessage()):
         # 3. 组装 messages
         messages = [system_prompt]
 
+        clean_history = []
+
         # 防止脏数据（关键！！！）
         for m in history:
             if (
@@ -365,6 +391,8 @@ async def handle_chat(bot: Bot, event: Event, args: Message = EventMessage()):
                 messages.append(m)
 
         messages.append({"role": "user", "content": msg})
+        
+        messages = [system_prompt] + clean_history
 
         # 4. 调用模型（修复：不再用 sync_call）
         reply = await call_deepseek(messages)
@@ -372,7 +400,6 @@ async def handle_chat(bot: Bot, event: Event, args: Message = EventMessage()):
         # 5. 写入 memory
         history.append({"role": "user", "content": msg})
         history.append({"role": "assistant", "content": reply})
-
         save_memory(user_id, history)
 
         await bot.send(event, reply)
