@@ -377,7 +377,7 @@ async def handle_chat(bot: Bot, event: Event, args: Message = EventMessage()):
     except Exception:
         import traceback
         logger.error(traceback.format_exc())
-        await bot.send(event, "出错了")
+        await bot.send(event, traceback.format_exc())
         
         
 def load_memory(user_id: str):
