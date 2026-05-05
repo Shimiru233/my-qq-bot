@@ -407,18 +407,14 @@ async def handle_chat(bot: Bot, event: Event, args: Message = EventMessage()):
         # 1. 读取历史
         history = load_memory(user_id)
 
-        # 2. system prompt
-        system_prompt = {
+        # 1. system
+        messages = [{
             "role": "system",
             "content": system_prompt_text.strip()
-        }
+        }]
 
-        # 3. 组装 messages
-        messages = [system_prompt]
 
-        clean_history = []
-
-        # 防止脏数据（关键！！！）
+        # 2. history（干净过滤）
         for m in history:
             if (
                 isinstance(m, dict)
@@ -427,16 +423,19 @@ async def handle_chat(bot: Bot, event: Event, args: Message = EventMessage()):
             ):
                 messages.append(m)
 
-        messages.append({"role": "user", "content": msg})
-        
-        messages = [system_prompt] + clean_history
+        # 3. user
+        messages.append({
+            "role": "user",
+            "content": msg
+        })
 
-        # 4. 调用模型（修复：不再用 sync_call）
+        # 4. call model
         reply = await call_deepseek(messages)
 
-        # 5. 写入 memory
+        # 5. save memory
         history.append({"role": "user", "content": msg})
         history.append({"role": "assistant", "content": reply})
+
         save_memory(user_id, history)
 
         await bot.send(event, reply)
