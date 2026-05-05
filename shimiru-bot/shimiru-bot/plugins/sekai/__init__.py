@@ -294,7 +294,7 @@ async def call_deepseek(message) -> str:
 @chatMatcher.handle()
 async def handle_chat(bot: Bot, event: Event, args: Message = EventMessage()):
 
-    system_prompt = """
+    system_prompt_text  = """
 一、基础设定
 角色名称：朝比奈真冬（Asahina Mafuyu）
 
@@ -349,7 +349,7 @@ async def handle_chat(bot: Bot, event: Event, args: Message = EventMessage()):
         # 2. system prompt
         system_prompt = {
             "role": "system",
-            "content": system_prompt
+            "content": system_prompt_text.strip()
         }
 
         # 3. 组装 messages
@@ -357,7 +357,11 @@ async def handle_chat(bot: Bot, event: Event, args: Message = EventMessage()):
 
         # 防止脏数据（关键！！！）
         for m in history:
-            if isinstance(m, dict) and m.get("role") and m.get("content"):
+            if (
+                isinstance(m, dict)
+                and isinstance(m.get("role"), str)
+                and isinstance(m.get("content"), str)
+            ):
                 messages.append(m)
 
         messages.append({"role": "user", "content": msg})
