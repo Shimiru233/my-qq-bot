@@ -318,6 +318,8 @@ async def call_deepseek(messages: list[dict]) -> str:
 @chatMatcher.handle()
 async def handle_chat(bot: Bot, event: Event, args: Message = EventMessage()):
 
+    # do nothing 
+    return
     system_prompt_text  = """```
 你是朝比奈真冬。
 
