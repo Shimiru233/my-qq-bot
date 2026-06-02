@@ -86,7 +86,7 @@ def get_song_payload_sync(song_id: str = None):
                 "id": song_id,
                 "title": title,
                 "aliases": aliases,
-                "img_url": f"https://covers.shimiru233.dpdns.org/{img_filename}" if os.path.exists(img_path) else None,
+                "img_url": f"http://127.0.0.1:{HTTP_PORT}/covers/{img_filename}" if os.path.exists(img_path) else None,
                 "img_path": img_path if os.path.exists(img_path) else None,
             }
     finally:
