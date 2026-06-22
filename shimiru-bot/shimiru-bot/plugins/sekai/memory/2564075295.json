@@ -1,0 +1,10 @@
+[
+  {
+    "role": "user",
+    "content": "苹果"
+  },
+  {
+    "role": "assistant",
+    "content": "……苹果。  \n是水果的一种。"
+  }
+]

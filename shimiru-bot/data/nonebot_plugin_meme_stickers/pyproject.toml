@@ -1,0 +1,16 @@
+[project]
+name = "meme-stickers-hub"
+version = "0"
+authors = [{ name = "LgCookie", email = "lgc2333@126.com" }]
+dependencies = ["nonebot-plugin-meme-stickers>=0.1.0", "rich>=13.9.4"]
+requires-python = ">=3.9"
+license = { text = "MIT" }
+
+[dependency-groups]
+dev = []
+
+[tool.pdm]
+distribution = false
+
+[tool.pdm.scripts]
+transform = { call = "scripts.transform_sekai_like:main" }

@@ -1,0 +1,22 @@
+[
+  {
+    "slug": "pjsk",
+    "source": {
+      "type": "github",
+      "owner": "lgc-NB2Dev",
+      "repo": "meme-stickers-hub",
+      "branch": "main",
+      "path": "pjsk"
+    }
+  },
+  {
+    "slug": "arcaea",
+    "source": {
+      "type": "github",
+      "owner": "lgc-NB2Dev",
+      "repo": "meme-stickers-hub",
+      "branch": "main",
+      "path": "arcaea"
+    }
+  }
+]

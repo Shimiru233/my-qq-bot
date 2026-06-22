@@ -231,30 +231,30 @@ searchMatcher = on_command("s")
 
 @searchMatcher.handle()
 async def search_song(bot: Bot, event: Event, args: Message = CommandArg()):
-    keyword = args.extract_plain_text().strip()
-    if not keyword:
-        await bot.send(event, "请输入歌曲名称，例如：/s lenfent")
-        return
-
-    song = await to_thread.run_sync(search_songs_sync, keyword)
-    if not song:
-        await bot.send(event, "没有找到相关歌曲")
-        return
-
-    data = await to_thread.run_sync(get_song_payload_sync, song["id"])
-    if not data:
-        await bot.send(event, "没有找到相关歌曲")
-        return
-
-    alias_text = ", ".join(data["aliases"]) if data["aliases"] else "无"
-    text_msg = f"歌曲: {data['title']} ({data['id']})\n别名: {alias_text}"
-
-    if data["img_url"]:
-        try:
-            await bot.send(event, MessageSegment.image(data["img_url"]))
-        except ActionFailed:
-            pass
-    await bot.send(event, text_msg)
+#    keyword = args.extract_plain_text().strip()
+#    if not keyword:
+#        await bot.send(event, "请输入歌曲名称，例如：/s lenfent")
+#        return
+#
+#    song = await to_thread.run_sync(search_songs_sync, keyword)
+#    if not song:
+#        await bot.send(event, "没有找到相关歌曲")
+#        return
+#
+#    data = await to_thread.run_sync(get_song_payload_sync, song["id"])
+#    if not data:
+#        await bot.send(event, "没有找到相关歌曲")
+#        return
+#
+#    alias_text = ", ".join(data["aliases"]) if data["aliases"] else "无"
+#    text_msg = f"歌曲: {data['title']} ({data['id']})\n别名: {alias_text}"
+#
+#    if data["img_url"]:
+#        try:
+#            await bot.send(event, MessageSegment.image(data["img_url"]))
+#        except ActionFailed:
+#            pass
+#    await bot.send(event, text_msg)
 
 
 # ── 猜歌回答监听 ─────────────────────────────────────

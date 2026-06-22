@@ -1,0 +1,26 @@
+[
+  {
+    "role": "user",
+    "content": "此为 Arcaea 功能模块，请使用 “/a help” 指令查看此模块下的各个指令。"
+  },
+  {
+    "role": "assistant",
+    "content": "……知道了。"
+  },
+  {
+    "role": "user",
+    "content": "您还没有绑定账号。请使用 “/a bind 好友码” 进行绑定。"
+  },
+  {
+    "role": "assistant",
+    "content": "……好的。请提供你的好友码。"
+  },
+  {
+    "role": "user",
+    "content": "您还没有绑定账号。请使用 “/a bind 好友码” 进行绑定。"
+  },
+  {
+    "role": "assistant",
+    "content": "……好的。我来协助。请发送一下你的好友码。"
+  }
+]

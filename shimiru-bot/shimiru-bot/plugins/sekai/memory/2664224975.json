@@ -1,0 +1,10 @@
+[
+  {
+    "role": "user",
+    "content": "ohno"
+  },
+  {
+    "role": "assistant",
+    "content": "怎么了吗？"
+  }
+]

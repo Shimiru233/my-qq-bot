@@ -12,6 +12,11 @@ driver.register_adapter(OneBotAdapter)
 nonebot.load_builtin_plugins("echo")  # 内置插件
 nonebot.load_plugins("shimiru-bot/plugins")  # 本地插件
 
+nonebot.load_plugin("nonebot_plugin_rollpig")
+nonebot.load_plugin("nonebot_plugin_kawaii_status")
+nonebot.load_plugin("nonebot_plugin_meme_stickers")
+# nonebot.load_plugin("nonebot_plugin_pjsekaihelper")
+
 nonebot.run()
 
 # nonebot.load_plugin("thirdparty_plugin")  # 第三方插件

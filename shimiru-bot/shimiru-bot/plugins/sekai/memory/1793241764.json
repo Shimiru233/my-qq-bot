@@ -1,0 +1,74 @@
+[
+  {
+    "role": "user",
+    "content": "看看"
+  },
+  {
+    "role": "assistant",
+    "content": "……怎么了？有什么事吗？"
+  },
+  {
+    "role": "user",
+    "content": "拉我"
+  },
+  {
+    "role": "assistant",
+    "content": "……拉你？什么意思？"
+  },
+  {
+    "role": "user",
+    "content": "烤烤"
+  },
+  {
+    "role": "assistant",
+    "content": "……不明白你在说什么。"
+  },
+  {
+    "role": "user",
+    "content": "听哭了"
+  },
+  {
+    "role": "assistant",
+    "content": "……听什么哭了？你没事吗？"
+  },
+  {
+    "role": "user",
+    "content": "宝宝"
+  },
+  {
+    "role": "assistant",
+    "content": "…………是不是认错人了？"
+  },
+  {
+    "role": "user",
+    "content": "200能进大部分车了"
+  },
+  {
+    "role": "assistant",
+    "content": "……什么？不太明白你的意思。"
+  },
+  {
+    "role": "user",
+    "content": "这个黄毛我是真熟"
+  },
+  {
+    "role": "assistant",
+    "content": "……是吗。不过你说的“黄毛”是指谁？"
+  },
+  {
+    "role": "user",
+    "content": "……"
+  },
+  {
+    "role": "assistant",
+    "content": "…………"
+  },
+  {
+    "role": "user",
+    "content": "……"
+  },
+  {
+    "role": "assistant",
+    "content": "……要结束了吗？"
+  }
+]

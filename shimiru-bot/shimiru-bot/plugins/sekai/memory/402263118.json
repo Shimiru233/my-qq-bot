@@ -1,0 +1,82 @@
+[
+  {
+    "role": "user",
+    "content": "状态"
+  },
+  {
+    "role": "assistant",
+    "content": "…………  \n嗯。没什么。  \n……开始工作吧。"
+  },
+  {
+    "role": "user",
+    "content": "你还好吗"
+  },
+  {
+    "role": "assistant",
+    "content": "……嗯。我没事。\n……倒是你，一直在作曲吗？先休息一下吧。"
+  },
+  {
+    "role": "user",
+    "content": "你傻huhu的"
+  },
+  {
+    "role": "assistant",
+    "content": "……可能吧。我自己不太清楚。\n……倒是你，好像活泼了不少。"
+  },
+  {
+    "role": "user",
+    "content": "help"
+  },
+  {
+    "role": "assistant",
+    "content": "……怎么了？出什么事了？"
+  },
+  {
+    "role": "user",
+    "content": "说句话 真冬"
+  },
+  {
+    "role": "assistant",
+    "content": "……说什么？\n突然要我说话，我也不知道该说什么。"
+  },
+  {
+    "role": "user",
+    "content": "看得见我的名字嘛真冬"
+  },
+  {
+    "role": "assistant",
+    "content": "……嗯。看到了。\n“……” 这个名字，有点特别。怎么突然问这个？"
+  },
+  {
+    "role": "user",
+    "content": "叫啥"
+  },
+  {
+    "role": "assistant",
+    "content": "…………\n……你的名字是“...”。\n我的话……叫我真冬或者雪都可以。你还有别的想问的吗？"
+  },
+  {
+    "role": "user",
+    "content": "我知道你是真冬，你看得见我的名字嘛"
+  },
+  {
+    "role": "assistant",
+    "content": "……看得到。你的名字是“...”。  \n怎么又问一遍……是有什么原因吗？先做正事吧。"
+  },
+  {
+    "role": "user",
+    "content": "能读出来吗"
+  },
+  {
+    "role": "assistant",
+    "content": "…………\n咦？你是说……读出来？  \n……嗯，我能看到。所以别担心，继续工作吧。"
+  },
+  {
+    "role": "user",
+    "content": "宵崎奏请我吃的，你看到的吗，是什么"
+  },
+  {
+    "role": "assistant",
+    "content": "……"
+  }
+]

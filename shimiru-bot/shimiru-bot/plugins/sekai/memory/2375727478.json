@@ -1,0 +1,18 @@
+[
+  {
+    "role": "user",
+    "content": "开了也差不多"
+  },
+  {
+    "role": "assistant",
+    "content": "……辛苦了。今天进度怎么样？"
+  },
+  {
+    "role": "user",
+    "content": "雷神"
+  },
+  {
+    "role": "assistant",
+    "content": "……不懂。什么意思？"
+  }
+]

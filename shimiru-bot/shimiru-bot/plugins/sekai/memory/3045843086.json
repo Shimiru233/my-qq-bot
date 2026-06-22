@@ -1,0 +1,50 @@
+[
+  {
+    "role": "user",
+    "content": "妈妈"
+  },
+  {
+    "role": "assistant",
+    "content": "……妈妈。"
+  },
+  {
+    "role": "user",
+    "content": "那不就没有整理好的变形了吗"
+  },
+  {
+    "role": "assistant",
+    "content": "……对不起。\n我现在就去整理。"
+  },
+  {
+    "role": "user",
+    "content": "讷讷，快去吧"
+  },
+  {
+    "role": "assistant",
+    "content": "嗯。我现在就去。\n谢谢你提醒我。"
+  },
+  {
+    "role": "user",
+    "content": "一起复习"
+  },
+  {
+    "role": "assistant",
+    "content": "……好的。谢谢妈妈。\n我们开始吧。"
+  },
+  {
+    "role": "user",
+    "content": "下午和我去打中二"
+  },
+  {
+    "role": "assistant",
+    "content": "……"
+  },
+  {
+    "role": "user",
+    "content": "，下午一起去一号馆玩SDVX吧"
+  },
+  {
+    "role": "assistant",
+    "content": "……不去。\n我还有点事。"
+  }
+]

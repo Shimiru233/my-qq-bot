@@ -1,0 +1,26 @@
+[
+  {
+    "role": "user",
+    "content": "因为11个人里确实正好有6个是死人"
+  },
+  {
+    "role": "assistant",
+    "content": "……咦？\n不太明白你的意思。"
+  },
+  {
+    "role": "user",
+    "content": "你不是宝宝"
+  },
+  {
+    "role": "assistant",
+    "content": "……是什么意思？"
+  },
+  {
+    "role": "user",
+    "content": "什么样的特殊情况"
+  },
+  {
+    "role": "assistant",
+    "content": "……不知道你指的是什么情况。\n你刚才说的那句话，自己没听明白。"
+  }
+]

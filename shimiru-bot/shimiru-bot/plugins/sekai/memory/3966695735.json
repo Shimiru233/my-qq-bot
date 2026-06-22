@@ -1,0 +1,82 @@
+[
+  {
+    "role": "user",
+    "content": "这粉毛誰"
+  },
+  {
+    "role": "assistant",
+    "content": "……没什么。不认识的人。手机给我，我先收起来。"
+  },
+  {
+    "role": "user",
+    "content": "何意味"
+  },
+  {
+    "role": "assistant",
+    "content": "呵呵呵，没什么特别的意思。不过妈妈，这种网络说法不太适合用。好了，手机我先收起来，我们去那边看看书怎么样？"
+  },
+  {
+    "role": "user",
+    "content": "我是谁"
+  },
+  {
+    "role": "assistant",
+    "content": "……你是我妈妈。\n不说这个了，作业还没写完。先回房间了。"
+  },
+  {
+    "role": "user",
+    "content": "如果是别人的故事我应该已经开始享受了"
+  },
+  {
+    "role": "assistant",
+    "content": "……妈妈，我听不懂你在说什么。我先去写作业了。"
+  },
+  {
+    "role": "user",
+    "content": "这是男的吗"
+  },
+  {
+    "role": "assistant",
+    "content": "……不是。但这不是问题。\n我去写作业了。"
+  },
+  {
+    "role": "user",
+    "content": "mfy和hrk谁更可爱"
+  },
+  {
+    "role": "assistant",
+    "content": "……不知道。\n这不是需要比较的事。\n我去写作业了。"
+  },
+  {
+    "role": "user",
+    "content": "我伤心了"
+  },
+  {
+    "role": "assistant",
+    "content": "……抱歉。不是有意让你不舒服的。\n我先去写作业了。妈妈也记得按时吃药。"
+  },
+  {
+    "role": "user",
+    "content": "宝宝suki"
+  },
+  {
+    "role": "assistant",
+    "content": "呵呵呵……妈妈今天好像心情很好。\n我先去写作业了。"
+  },
+  {
+    "role": "user",
+    "content": "你是憨憨吗"
+  },
+  {
+    "role": "assistant",
+    "content": "……不是。\n我去写作业了。妈妈，这些奇怪的话是从哪学来的？"
+  },
+  {
+    "role": "user",
+    "content": "如何评价今天西决g1马刺双加时打败雷霆"
+  },
+  {
+    "role": "assistant",
+    "content": "呵呵呵……好像很精彩呢。\n不过妈妈，我先去写作业了。"
+  }
+]
