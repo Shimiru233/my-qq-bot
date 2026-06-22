@@ -93,7 +93,8 @@ def fetch_all_cards() -> list[dict]:
                 "member": c.get("member", 0),
                 "attribute": c.get("i_attribute", "?"),
                 "rarity": c.get("i_rarity", 0),
-                "image": c.get("image"),
+                "image": c.get("image"),        # 头像缩略图
+                "art": c.get("art"),            # 完整卡面
                 "skill_name": c.get("skill_name", ""),
             })
         if data["next"] is None:
@@ -276,10 +277,10 @@ async def handle_watch(bot: Bot, event: Event):
         return
 
     card = random_card(member_id=mid)
-    if not card or not card["image"]:
+    if not card or not card["art"]:
         return
 
     try:
-        await bot.send(event, MessageSegment.image(card["image"]))
+        await bot.send(event, MessageSegment.image(card["art"]))
     except ActionFailed:
         pass
