@@ -276,8 +276,10 @@ async def handle_watch(bot: Bot, event: Event):
         return
 
     card = random_card(member_id=mid)
-    if not card:
-        await bot.send(event, f"角色 {char_name} 没有卡牌数据")
+    if not card or not card["image"]:
         return
 
-    await send_card(bot, event, card)
+    try:
+        await bot.send(event, MessageSegment.image(card["image"]))
+    except ActionFailed:
+        pass
