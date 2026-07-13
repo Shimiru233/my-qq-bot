@@ -231,6 +231,7 @@ searchMatcher = on_command("s")
 
 @searchMatcher.handle()
 async def search_song(bot: Bot, event: Event, args: Message = CommandArg()):
+    pass
 #    keyword = args.extract_plain_text().strip()
 #    if not keyword:
 #        await bot.send(event, "请输入歌曲名称，例如：/s lenfent")
@@ -255,6 +256,94 @@ async def search_song(bot: Bot, event: Event, args: Message = CommandArg()):
 #        except ActionFailed:
 #            pass
 #    await bot.send(event, text_msg)
+
+
+# ── /arecent 消息转发 ─────────────────────────────────
+TARGET_QQ = 123456789  # TODO: 填写转发目标 QQ 号
+RELAY_TIMEOUT = 120
+
+_pending_recent: dict[str, asyncio.Task] = {}
+_recent_requester: dict = {}  # 当前等待回复的请求者信息
+
+
+arecentMatcher = on_command("arecent", rule=to_me())
+
+
+@arecentMatcher.handle()
+async def handle_arecent(bot: Bot, event: Event):
+    user_id = event.get_user_id()
+    group_id = getattr(event, "group_id", None)
+    sender = event.sender
+    nickname = sender.nickname if sender else user_id
+
+    # 构建转发给目标的消息
+    if group_id:
+        source = f"群 {group_id} 用户 {nickname}({user_id})"
+    else:
+        source = f"用户 {nickname}({user_id})"
+
+    try:
+        await bot.send_private_msg(user_id=TARGET_QQ, message=f"{source} 的 recent 请求")
+    except ActionFailed:
+        await bot.send(event, "转发失败，目标 QQ 无法联系")
+        return
+
+    # 存储请求者信息，等待目标回复
+    _recent_requester.clear()
+    _recent_requester["bot"] = bot
+    _recent_requester["event"] = event
+    _recent_requester["group_id"] = group_id
+    _recent_requester["user_id"] = user_id
+
+    # 取消旧超时
+    for t in _pending_recent.values():
+        t.cancel()
+    _pending_recent.clear()
+
+    # 创建超时任务
+    _pending_recent["timeout"] = asyncio.create_task(_recent_timeout(bot, event, RELAY_TIMEOUT))
+
+    await bot.send(event, "已转发请求，等待回复...")
+
+
+async def _recent_timeout(bot: Bot, event: Event, delay: int):
+    await asyncio.sleep(delay)
+    _recent_requester.clear()
+    _pending_recent.clear()
+    try:
+        await bot.send(event, "recent 请求超时，没有收到回复")
+    except ActionFailed:
+        pass
+
+
+# 监听目标 QQ 的私聊回复
+recentReplyListener = on_message(priority=5)
+
+
+@recentReplyListener.handle()
+async def handle_recent_reply(bot: Bot, event: Event):
+    # 只处理目标 QQ 的私聊消息
+    if getattr(event, "message_type", None) != "private":
+        return
+    if event.get_user_id() != str(TARGET_QQ):
+        return
+    if not _recent_requester:
+        return
+
+    state = _recent_requester.copy()
+    _recent_requester.clear()
+
+    # 取消超时
+    for t in _pending_recent.values():
+        t.cancel()
+    _pending_recent.clear()
+
+    # 转发回复
+    sender = event.sender
+    target_name = sender.nickname if sender else str(TARGET_QQ)
+    forward_msg = Message(f"[{target_name} 的回复]\n") + event.get_message()
+
+    await bot.send(state["event"], forward_msg)
 
 
 # ── 猜歌回答监听 ─────────────────────────────────────
