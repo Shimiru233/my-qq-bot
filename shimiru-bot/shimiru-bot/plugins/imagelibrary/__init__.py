@@ -125,13 +125,13 @@ dataset.ensure_file_exists("image.json")
 add_matcher = on_startswith("/添加")
 get_matcher = on_startswith(("/来只", "/来点", "/来个"))
 pixiv_matcher = on_startswith("/插画")
-delete_matcher = on_startswith("/删除")
-list_matcher = on_startswith("/图片列表")
-enable_matcher = on_startswith("/启用")
-disable_matcher = on_startswith("/禁用")
-own_matcher = on_startswith("/独占")
-disown_matcher = on_startswith("/取消独占")
-intro_matcher = on_startswith("/关于图库")
+delete_matcher = on_startswith("/删除", rule=to_me(), permission=GROUP_ADMIN | GROUP_OWNER | SUPERUSER)
+list_matcher = on_startswith("/图片列表", rule=to_me(), permission=GROUP_ADMIN | GROUP_OWNER | SUPERUSER)
+enable_matcher = on_startswith("/启用", rule=to_me(), permission=GROUP_ADMIN | GROUP_OWNER | SUPERUSER)
+disable_matcher = on_startswith("/禁用", rule=to_me(), permission=GROUP_ADMIN | GROUP_OWNER | SUPERUSER)
+own_matcher = on_startswith("/独占", rule=to_me(), permission=SUPERUSER)
+disown_matcher = on_startswith("/取消独占", rule=to_me(), permission=SUPERUSER)
+intro_matcher = on_startswith("/关于图库", rule=to_me())
 
 
 async def image_save(path, filename):
@@ -309,18 +309,26 @@ async def fetch_pixiv_data(event: Event):
         await pixiv_matcher.finish("没找到关键tag...\n不过你可以尝试翻译成日文或者英文再试一次")
 
 
+_adding_sessions: dict[str, str] = {}  # user_id → keyword
+
+
 @add_matcher.handle()
 async def _(event: Event):
     name = event.get_plaintext().strip()[len("/添加"):].strip()
     if not check_permission(event, name):
         await add_matcher.finish(f"词条{name}被禁止使用")
     else:
-        dataset.update_value("adding", "target", name)
+        _adding_sessions[event.get_user_id()] = name
         await add_matcher.pause("添加什么？")
 
 
 @add_matcher.handle()
 async def _(event: Event):
+    user_id = event.get_user_id()
+    name = _adding_sessions.pop(user_id, None)
+    if name is None:
+        return  # 不是当前添加会话的用户，忽略
+
     msg = str(event.get_message())
 
     msg = msg.replace("&#91;", "[")
@@ -329,7 +337,6 @@ async def _(event: Event):
     if "url=" in msg:
         msg = msg.split("url=")[1]
         msg = msg.split(']')[0]
-    name = dataset.get_value("adding", "target")
     p = dataset.get_value(name, "using")
 
     if "cn:443/" in msg:
