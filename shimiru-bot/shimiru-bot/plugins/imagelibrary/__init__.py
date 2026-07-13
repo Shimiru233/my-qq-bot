@@ -348,8 +348,10 @@ async def _get_replied_images(bot: Bot, event: Event) -> list[str]:
     """获取被引用消息中的图片 URL"""
     # LLOneBot / napcat 直接把被引消息放在 event.reply 里
     reply_info = getattr(event, "reply", None)
+    logger.info(f"[imagelibrary] event.reply = {type(reply_info)} {reply_info}")
     if reply_info and isinstance(reply_info, dict):
         msg_content = reply_info.get("message")
+        logger.info(f"[imagelibrary] reply message type={type(msg_content)} keys={list(reply_info.keys())}")
         if msg_content:
             if isinstance(msg_content, Message):
                 return _extract_images(msg_content)
@@ -360,16 +362,19 @@ async def _get_replied_images(bot: Bot, event: Event) -> list[str]:
     for seg in event.get_message():
         if seg.type == "reply":
             msg_id = seg.data.get("id")
+            logger.info(f"[imagelibrary] fallback: reply seg found, msg_id={msg_id}")
             if msg_id:
                 try:
                     replied = await bot.get_msg(message_id=int(msg_id))
+                    logger.info(f"[imagelibrary] bot.get_msg returned: {replied}")
                     msg_content = replied["message"]
                     if isinstance(msg_content, Message):
                         return _extract_images(msg_content)
                     return _extract_images(Message(msg_content))
-                except Exception:
-                    pass
+                except Exception as e:
+                    logger.warning(f"[imagelibrary] bot.get_msg failed: {e}")
             break
+    logger.info(f"[imagelibrary] no reply images found")
     return []
 
 
@@ -380,6 +385,7 @@ async def _(bot: Bot, event: Event):
         await add_matcher.finish(f"词条{name}被禁止使用")
 
     msg = event.get_message()
+    logger.info(f"[imagelibrary] seg types: {[(s.type, s.data) for s in msg]}")
     # 当前消息或引用消息里有图片就直接存
     images = _extract_images(msg) + await _get_replied_images(bot, event)
     if images:
