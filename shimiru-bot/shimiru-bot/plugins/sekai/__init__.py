@@ -274,7 +274,7 @@ client = OpenAI(\
     base_url="https://api.deepseek.com"
 )
 
-chatMatcher = on_message(rule=to_me(), priority=1)
+chatMatcher = on_message(rule=to_me(), priority=99)
 
 
 async def call_deepseek(messages: list[dict]) -> str:
