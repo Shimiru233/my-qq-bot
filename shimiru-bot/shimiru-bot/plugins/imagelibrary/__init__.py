@@ -120,29 +120,16 @@ dataset.ensure_directory_exists("library")
 
 dataset.ensure_file_exists("image.json")
 
-image_library_introduce = on_startswith("/关于图库", rule=to_me(), priority=10, block=True)
-image_adder = on_startswith("/添加", priority=10, block=True)
-
-get_image = on_startswith(("/来只", "/来点", "/来个"), priority=10, block=True)
-pixiv_image = on_startswith("/插画", priority=10, block=True)
-
-image_deleter = on_startswith("/删除", rule=to_me(),
-                               permission=GROUP_ADMIN | GROUP_OWNER | SUPERUSER,
-                               priority=10, block=True)
-image_list = on_startswith("/图片列表", rule=to_me(),
-                            permission=GROUP_ADMIN | GROUP_OWNER | SUPERUSER,
-                            priority=10, block=True)
-open_image_permission = on_startswith("/启用", rule=to_me(),
-                                       permission=GROUP_ADMIN | GROUP_OWNER | SUPERUSER,
-                                       priority=10, block=True)
-close_image_permission = on_startswith("/禁用", rule=to_me(),
-                                        permission=GROUP_ADMIN | GROUP_OWNER | SUPERUSER,
-                                        priority=10, block=True)
-
-disown_image_permission = on_startswith("/取消独占", rule=to_me(), permission=SUPERUSER,
-                                         priority=10, block=True)
-own_image_permission = on_startswith("/独占", rule=to_me(), permission=SUPERUSER,
-                                      priority=10, block=True)
+add_matcher = on_startswith("/添加")
+get_matcher = on_startswith(("/来只", "/来点", "/来个"))
+pixiv_matcher = on_startswith("/插画")
+delete_matcher = on_startswith("/删除")
+list_matcher = on_startswith("/图片列表")
+enable_matcher = on_startswith("/启用")
+disable_matcher = on_startswith("/禁用")
+own_matcher = on_startswith("/独占")
+disown_matcher = on_startswith("/取消独占")
+intro_matcher = on_startswith("/关于图库")
 
 
 async def image_save(path, filename):
@@ -177,7 +164,7 @@ def check_permission(event, key):
         return True
 
 
-@image_library_introduce.handle()
+@intro_matcher.handle()
 async def _():
     msg = """Image Library 图库
 一个共享给所有人的资源库
@@ -198,10 +185,10 @@ XXX后面接@[数字]可以选择词条下的指定内容
 独占/取消独占: 让某个群聊独占/取消独占一个关键词，其他群和私聊不可用
 
 有任何问题欢迎 @单子叶蚕豆 反馈！"""
-    await image_library_introduce.finish(msg)
+    await intro_matcher.finish(msg)
 
 
-@own_image_permission.handle()
+@own_matcher.handle()
 async def _(event: Event):
     from_info = event.get_session_id()
     key = event.get_plaintext().strip()[len("/独占"):].strip()
@@ -209,7 +196,7 @@ async def _(event: Event):
     if '_' in from_info:
         group = from_info.split('_')[1]
     if group == 'personal':
-        await own_image_permission.finish("此功能仅可用于群聊")
+        await own_matcher.finish("此功能仅可用于群聊")
         return
     try:
         ban_list = ["ALL" + group]
@@ -217,11 +204,11 @@ async def _(event: Event):
     except MatcherException:
         raise
     except Exception as e:
-        await own_image_permission.finish(f"{key}词条不存在")
-    await own_image_permission.finish(f"本群已独占{key}词条")
+        await own_matcher.finish(f"{key}词条不存在")
+    await own_matcher.finish(f"本群已独占{key}词条")
 
 
-@disown_image_permission.handle()
+@disown_matcher.handle()
 async def _(event: Event):
     from_info = event.get_session_id()
     key = event.get_plaintext().strip()[len("/取消独占"):].strip()
@@ -229,7 +216,7 @@ async def _(event: Event):
     if '_' in from_info:
         group = from_info.split('_')[1]
     if group == 'personal':
-        await disown_image_permission.finish("此功能仅可用于群聊")
+        await disown_matcher.finish("此功能仅可用于群聊")
         return
     try:
         ban_list = '[]'
@@ -237,11 +224,11 @@ async def _(event: Event):
     except MatcherException:
         raise
     except Exception as e:
-        await disown_image_permission.finish(f"{key}词条不存在")
-    await disown_image_permission.finish(f"已解除{key}词条的独占")
+        await disown_matcher.finish(f"{key}词条不存在")
+    await disown_matcher.finish(f"已解除{key}词条的独占")
 
 
-@open_image_permission.handle()
+@enable_matcher.handle()
 async def _(event: Event):
     from_info = event.get_session_id()
     key = event.get_plaintext().strip()[len("/启用"):].strip()
@@ -249,29 +236,29 @@ async def _(event: Event):
     if '_' in from_info:
         group = from_info.split('_')[1]
     if group == 'personal':
-        await open_image_permission.finish("此功能仅可用于群聊")
+        await enable_matcher.finish("此功能仅可用于群聊")
         return
 
     ban_list = ""
     try:
         ban_list = dataset.get_value(key, "ban").replace("'", '"')
     except:
-        await open_image_permission.finish(f"{key}词条不存在")
+        await enable_matcher.finish(f"{key}词条不存在")
     res_list = json.loads(ban_list)
     if len(res_list) == 0:
-        await open_image_permission.finish(f"已启用本群的{key}词条")
+        await enable_matcher.finish(f"已启用本群的{key}词条")
         return
 
     if "ALL" in res_list[0]:
-        await open_image_permission.finish(f"{key}词条已被独占，请联系bot主获取权限吧")
+        await enable_matcher.finish(f"{key}词条已被独占，请联系bot主获取权限吧")
     for i in range(len(res_list)):
         if group == res_list[i]:
             del res_list[i]
     dataset.update_value(key, "ban", str(res_list))
-    await open_image_permission.finish(f"已启用本群的{key}词条")
+    await enable_matcher.finish(f"已启用本群的{key}词条")
 
 
-@close_image_permission.handle()
+@disable_matcher.handle()
 async def _(event: Event):
     from_info = event.get_session_id()
     key = event.get_plaintext().strip()[len("/禁用"):].strip()
@@ -279,20 +266,20 @@ async def _(event: Event):
     if '_' in from_info:
         group = from_info.split('_')[1]
     if group == 'personal':
-        await close_image_permission.finish("此功能仅可用于群聊")
+        await disable_matcher.finish("此功能仅可用于群聊")
         return
     ban_list = ""
     try:
         ban_list = dataset.get_value(key, "ban").replace("'", '"')
     except:
-        await close_image_permission.finish(f"{key}词条不存在")
+        await disable_matcher.finish(f"{key}词条不存在")
     res_list = json.loads(ban_list)
 
     if len(res_list) and "ALL" in res_list[0]:
-        await close_image_permission.finish(f"{key}词条已被独占，请联系bot主获取权限吧")
+        await disable_matcher.finish(f"{key}词条已被独占，请联系bot主获取权限吧")
     res_list.append(group)
     dataset.update_value(key, "ban", str(res_list))
-    await close_image_permission.finish(f"已禁用本群的{key}词条")
+    await disable_matcher.finish(f"已禁用本群的{key}词条")
 
 
 async def get_pixiv_image(url):
@@ -303,7 +290,7 @@ async def get_pixiv_image(url):
             return m
 
 
-@pixiv_image.handle()
+@pixiv_matcher.handle()
 async def fetch_pixiv_data(event: Event):
     url = "https://image.anosu.top/pixiv/json"
     key = event.get_plaintext().strip()[len("/插画"):].strip()
@@ -313,24 +300,24 @@ async def fetch_pixiv_data(event: Event):
     try:
         m = await get_pixiv_image(url)
         msg = "pid:{}\n>>>{}\ntags:{}".format(m["pid"], m["title"], m["tags"])
-        await pixiv_image.finish(msg + MessageSegment.image(m["url"]))
+        await pixiv_matcher.finish(msg + MessageSegment.image(m["url"]))
     except MatcherException:
         raise
     except:
-        await pixiv_image.finish("没找到关键tag...\n不过你可以尝试翻译成日文或者英文再试一次")
+        await pixiv_matcher.finish("没找到关键tag...\n不过你可以尝试翻译成日文或者英文再试一次")
 
 
-@image_adder.handle()
+@add_matcher.handle()
 async def _(event: Event):
     name = event.get_plaintext().strip()[len("/添加"):].strip()
     if not check_permission(event, name):
-        await image_adder.finish(f"词条{name}被禁止使用")
+        await add_matcher.finish(f"词条{name}被禁止使用")
     else:
         dataset.update_value("adding", "target", name)
-        await image_adder.pause("添加什么？")
+        await add_matcher.pause("添加什么？")
 
 
-@image_adder.handle()
+@add_matcher.handle()
 async def _(event: Event):
     msg = str(event.get_message())
 
@@ -354,10 +341,10 @@ async def _(event: Event):
     else:
         dataset.update_value(name, "using", p + 1)
         dataset.update_value(name, str(p + 1), msg)
-    await image_adder.finish("添加成功！")
+    await add_matcher.finish("添加成功！")
 
 
-@get_image.handle()
+@get_matcher.handle()
 async def _(event: Event):
     raw = event.get_plaintext().strip()
     for prefix in ("/来只", "/来点", "/来个"):
@@ -368,7 +355,7 @@ async def _(event: Event):
         msg = raw
 
     if not check_permission(event, msg):
-        await get_image.finish(f"词条{msg}被禁止使用")
+        await get_matcher.finish(f"词条{msg}被禁止使用")
 
     code = 0
     out_msg = ""
@@ -378,66 +365,66 @@ async def _(event: Event):
             try:
                 int(code)
             except:
-                await get_image.finish("@后面需要跟一个数字！")
+                await get_matcher.finish("@后面需要跟一个数字！")
             msg = msg.split("@")[0]
         else:
             p = dataset.get_value(msg, "using")
             if type(p) is bool:
-                await get_image.finish("他貌似还没有被添加")
+                await get_matcher.finish("他貌似还没有被添加")
             if int(p) == 0:
-                await get_image.finish("关键词存在，但是关键词下面没有可用词条欸，是不是被删除了？")
+                await get_matcher.finish("关键词存在，但是关键词下面没有可用词条欸，是不是被删除了？")
             code = str(random.randint(1, 100000) % int(p) + 1)
 
         p = dataset.get_value(msg, "using")
         if type(p) is bool:
-            await get_image.finish("他貌似还没有被添加")
+            await get_matcher.finish("他貌似还没有被添加")
         if int(p) == 0:
-            await get_image.finish("关键词存在，但是关键词下面没有可用词条欸，是不是被删除了？")
+            await get_matcher.finish("关键词存在，但是关键词下面没有可用词条欸，是不是被删除了？")
         if int(code) < 1 or int(p) < int(code):
-            await get_image.finish(f"标号不对哦，现在此关键词下只有{p}个条目")
+            await get_matcher.finish(f"标号不对哦，现在此关键词下只有{p}个条目")
 
         out_msg = str(dataset.get_value(msg, code))
         logger.success("Get File:{}".format(out_msg))
     except MatcherException:
         raise
     except:
-        await get_image.finish("他貌似还没有被添加")
+        await get_matcher.finish("他貌似还没有被添加")
     if 'mp4' in out_msg[-3:]:
         try:
-            await get_image.finish(MessageSegment.video(out_msg))
+            await get_matcher.finish(MessageSegment.video(out_msg))
         except MatcherException:
             raise
         except:
             p = dataset.get_value(msg, "using")
             del_value(msg, code)
-            await get_image.finish(f'这个词条好像资源出问题了,我来清理掉，应该还剩{p - 1}个内容')
+            await get_matcher.finish(f'这个词条好像资源出问题了,我来清理掉，应该还剩{p - 1}个内容')
     if 'png' in out_msg[-3:]:
         try:
-            await get_image.finish(MessageSegment.image(out_msg))
+            await get_matcher.finish(MessageSegment.image(out_msg))
         except MatcherException:
             raise
         except:
             p = dataset.get_value(msg, "using")
             del_value(msg, code)
-            await get_image.finish(f'这个词条好像资源出问题了,我来清理掉，应该还剩{p - 1}个内容')
+            await get_matcher.finish(f'这个词条好像资源出问题了,我来清理掉，应该还剩{p - 1}个内容')
 
     if 'False' == out_msg:
-        await get_image.finish('没有这个编号...')
-    await get_image.finish(MessageSegment.text(out_msg))
+        await get_matcher.finish('没有这个编号...')
+    await get_matcher.finish(MessageSegment.text(out_msg))
 
 
-@image_deleter.handle()
+@delete_matcher.handle()
 async def _(event: Event):
     name = event.get_plaintext().strip()[len("/删除"):].strip()
 
     if not check_permission(event, name):
-        await image_deleter.finish(f"词条{name}被禁止使用")
+        await delete_matcher.finish(f"词条{name}被禁止使用")
     else:
         dataset.update_value("deleting", "target", name)
         left = dataset.get_value(name, "using")
         if not left:
-            await image_deleter.finish(f"词条不存在")
-        await image_deleter.pause(f"{name}词条总共有{left}个内容，确定删除吗？")
+            await delete_matcher.finish(f"词条不存在")
+        await delete_matcher.pause(f"{name}词条总共有{left}个内容，确定删除吗？")
 
 
 def del_value(key, value):
@@ -458,28 +445,28 @@ def del_value(key, value):
         dataset.update_value(key, i, new_dic[i])
 
 
-@image_deleter.handle()
+@delete_matcher.handle()
 async def _(event: Event):
     msg = str(event.get_message())
     if msg == "确定":
         name = dataset.get_value("deleting", "target")
         dataset.update_value(name, "using", 0)
-        await image_deleter.finish("删除成功！")
+        await delete_matcher.finish("删除成功！")
     elif msg == "彻底删除":
         name = dataset.get_value("deleting", "target")
         dataset.delete_key(name)
-        await image_deleter.finish("它已经不复存在了！")
+        await delete_matcher.finish("它已经不复存在了！")
     elif "只删" in msg:
         p = msg.split('只删')[1]
         name = dataset.get_value("deleting", "target")
         del_value(name, p)
         left = dataset.get_value(name, "using")
-        await image_deleter.finish(f"好啦，我只删除了{p}，现在应该还有{left}个条目!")
+        await delete_matcher.finish(f"好啦，我只删除了{p}，现在应该还有{left}个条目!")
     else:
-        await image_deleter.finish("好吧...如果你确定好了，告诉我一声")
+        await delete_matcher.finish("好吧...如果你确定好了，告诉我一声")
 
 
-@image_list.handle()
+@list_matcher.handle()
 async def _():
     try:
         note = dataset.get_dataset()
@@ -488,9 +475,9 @@ async def _():
             title_list.append(i)
         title_list.remove("adding")
         msg = MessageSegment.text("Bot总共记录了{}个关键词，分别为：".format(len(title_list)) + "\n" + str(title_list))
-        await image_list.finish(msg)
+        await list_matcher.finish(msg)
     except MatcherException:
         raise
     except:
-        await image_list.finish("出错了...")
+        await list_matcher.finish("出错了...")
 
