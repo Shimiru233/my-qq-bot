@@ -8,16 +8,13 @@
 # @File    : test.py
 # @IDE     : PyCharm
 
-from nonebot import logger
+from nonebot import on_command, on_message, require, logger
 from nonebot.rule import to_me
-from nonebot.plugin import on_command
-from nonebot.adapters.onebot.v11 import Message, MessageSegment
+from nonebot.adapters.onebot.v11 import Bot, Event, Message, MessageSegment
+from nonebot.adapters.onebot.v11.permission import GROUP_ADMIN, GROUP_OWNER
 from nonebot.exception import MatcherException
 from nonebot.params import CommandArg
-from nonebot.adapters import Bot, Event
 from nonebot.permission import SUPERUSER
-from nonebot.adapters.onebot.v11.permission import GROUP_ADMIN, GROUP_OWNER
-from nonebot import require
 require("nonebot_plugin_localstore")
 from pathlib import Path
 import nonebot_plugin_localstore as store
