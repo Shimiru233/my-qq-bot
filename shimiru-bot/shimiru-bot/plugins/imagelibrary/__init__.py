@@ -10,7 +10,7 @@
 
 from nonebot import on_startswith, require, logger
 from nonebot.rule import to_me
-from nonebot.adapters.onebot.v11 import Event, MessageSegment
+from nonebot.adapters.onebot.v11 import Bot, Event, Message, MessageSegment
 from nonebot.adapters.onebot.v11.permission import GROUP_ADMIN, GROUP_OWNER
 from nonebot.exception import MatcherException
 from nonebot.permission import SUPERUSER
@@ -309,48 +309,87 @@ async def fetch_pixiv_data(event: Event):
         await pixiv_matcher.finish("没找到关键tag...\n不过你可以尝试翻译成日文或者英文再试一次")
 
 
+def _extract_images(message: Message) -> list[str]:
+    """从消息中提取所有图片 URL"""
+    urls = []
+    for seg in message:
+        if seg.type == "image":
+            url = seg.data.get("url", "")
+            if url:
+                urls.append(url)
+    return urls
+
+
+async def _save_images(name: str, urls: list[str]) -> int:
+    """把图片 URL 存到词条下，返回实际存了多少张"""
+    p = dataset.get_value(name, "using")
+    if not p:
+        p = 0
+    else:
+        p = int(p)
+
+    saved = 0
+    for url in urls:
+        p += 1
+        path = await image_save(f"{name}{p}.png", url)
+        dataset.update_value(name, str(p), path)
+        saved += 1
+
+    dataset.update_value(name, "using", p)
+    if not dataset.get_value(name, "ban"):
+        dataset.update_value(name, "ban", "[]")
+    return saved
+
+
 _adding_sessions: dict[str, str] = {}  # user_id → keyword
 
 
+async def _get_replied_images(bot: Bot, message: Message) -> list[str]:
+    """如果消息引用了图片消息，拿到被引用消息中的图片 URL"""
+    for seg in message:
+        if seg.type == "reply":
+            msg_id = seg.data.get("id")
+            if msg_id:
+                try:
+                    replied = await bot.get_msg(message_id=int(msg_id))
+                    return _extract_images(replied["message"])
+                except Exception:
+                    pass
+            break
+    return []
+
+
 @add_matcher.handle()
-async def _(event: Event):
+async def _(bot: Bot, event: Event):
     name = event.get_plaintext().strip()[len("/添加"):].strip()
     if not check_permission(event, name):
         await add_matcher.finish(f"词条{name}被禁止使用")
-    else:
-        _adding_sessions[event.get_user_id()] = name
-        await add_matcher.pause("添加什么？")
+
+    msg = event.get_message()
+    # 当前消息或引用消息里有图片就直接存
+    images = _extract_images(msg) + await _get_replied_images(bot, msg)
+    if images:
+        saved = await _save_images(name, images)
+        await add_matcher.finish(f"添加成功！已收录 {saved} 张图片")
+
+    _adding_sessions[event.get_user_id()] = name
+    await add_matcher.pause("添加什么图片？")
 
 
 @add_matcher.handle()
-async def _(event: Event):
+async def _(bot: Bot, event: Event):
     user_id = event.get_user_id()
     name = _adding_sessions.pop(user_id, None)
     if name is None:
-        return  # 不是当前添加会话的用户，忽略
+        return
 
-    msg = str(event.get_message())
+    msg = event.get_message()
+    images = _extract_images(msg) + await _get_replied_images(bot, msg)
+    if not images:
+        await add_matcher.finish("请发送图片！")
 
-    msg = msg.replace("&#91;", "[")
-    msg = msg.replace("&#93;", "]")
-    msg = msg.replace("&amp;", "&")
-    if "url=" in msg:
-        msg = msg.split("url=")[1]
-        msg = msg.split(']')[0]
-    p = dataset.get_value(name, "using")
-
-    if "cn:443/" in msg:
-        msg = await image_save(f"{name}{p + 1}.mp4", msg)
-    elif "download?" in msg:
-        msg = await image_save(f"{name}{p + 1}.png", msg)
-    if not p:
-        dataset.update_value(name, "using", 1)
-        dataset.update_value(name, "ban", "[]")
-        dataset.update_value(name, "1", msg)
-    else:
-        dataset.update_value(name, "using", p + 1)
-        dataset.update_value(name, str(p + 1), msg)
-    await add_matcher.finish("添加成功！")
+    saved = await _save_images(name, images)
+    await add_matcher.finish(f"添加成功！已收录 {saved} 张图片")
 
 
 @get_matcher.handle()
