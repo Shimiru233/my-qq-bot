@@ -111,7 +111,7 @@ class DataSetControl:
         if not os.path.exists(os.path.join(self.base_path, path)):
             with open(os.path.join(self.base_path, path), 'w', encoding='UTF-8')as f:
                 if 'json' in path:
-                    f.write(json.dumps("{}"))
+                    f.write(json.dumps({}))
 
 
 dataset = DataSetControl("image.json", data_path)
