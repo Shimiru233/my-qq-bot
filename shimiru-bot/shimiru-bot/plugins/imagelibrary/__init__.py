@@ -72,7 +72,9 @@ class DataSetControl:
         with open(os.path.join(self.base_path, self.data_file), 'r', encoding='UTF-8') as f:
             try:
                 load_dict = json.load(f)
-                return load_dict
+                if isinstance(load_dict, dict):
+                    return load_dict
+                return {}
             except:
                 return {}
 
