@@ -288,8 +288,6 @@ async def handle_arecent(bot: Bot, event: Event):
     # 每次发消息都重置超时
     _reset_timeout(RELAY_TIMEOUT)
 
-    await bot.send(event, "已转发请求，等待回复...")
-
 
 async def _recent_timeout(delay: int):
     await asyncio.sleep(delay)
