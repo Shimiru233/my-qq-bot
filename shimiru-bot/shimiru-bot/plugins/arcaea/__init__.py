@@ -281,25 +281,13 @@ async def handle_arecent(bot: Bot, event: Event):
         await bot.send(event, "转发失败，目标 QQ 无法联系")
         return
 
-    # 存储请求者信息，等待目标回复
-    _recent_requester.clear()
-    _recent_requester["bot"] = bot
-    _recent_requester["event"] = event
-    _recent_requester["group_id"] = group_id
-    _recent_requester["user_id"] = user_id
+    # 首次触发时建立会话，后续触发只续期不覆盖
+    if not _recent_requester:
+        _recent_requester["bot"] = bot
+        _recent_requester["event"] = event
 
-    # 取消旧超时
-    for t in _pending_recent.values():
-        t.cancel()
-    _pending_recent.clear()
-
-    # 取消旧超时
-    for t in _pending_recent.values():
-        t.cancel()
-    _pending_recent.clear()
-
-    # 创建超时任务
-    _pending_recent["timeout"] = asyncio.create_task(_recent_timeout(RELAY_TIMEOUT))
+    # 每次发消息都重置超时
+    _reset_timeout(RELAY_TIMEOUT)
 
     await bot.send(event, "已转发请求，等待回复...")
 
