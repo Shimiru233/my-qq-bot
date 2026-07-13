@@ -8,12 +8,11 @@
 # @File    : test.py
 # @IDE     : PyCharm
 
-from nonebot import on_command, on_message, require, logger
+from nonebot import on_startswith, require, logger
 from nonebot.rule import to_me
-from nonebot.adapters.onebot.v11 import Bot, Event, Message, MessageSegment
+from nonebot.adapters.onebot.v11 import Event, MessageSegment
 from nonebot.adapters.onebot.v11.permission import GROUP_ADMIN, GROUP_OWNER
 from nonebot.exception import MatcherException
-from nonebot.params import CommandArg
 from nonebot.permission import SUPERUSER
 require("nonebot_plugin_localstore")
 from pathlib import Path
@@ -121,25 +120,29 @@ dataset.ensure_directory_exists("library")
 
 dataset.ensure_file_exists("image.json")
 
-image_library_introduce = on_command("关于图库", rule=to_me(), priority=10, block=True)
-image_adder = on_command("添加", priority=10, block=True)
+image_library_introduce = on_startswith("/关于图库", rule=to_me(), priority=10, block=True)
+image_adder = on_startswith("/添加", priority=10, block=True)
 
-get_image = on_command("来只", aliases={"来点", "来个"}, priority=10, block=True)
-pixiv_image = on_command("插画", priority=10, block=True)
+get_image = on_startswith(("/来只", "/来点", "/来个"), priority=10, block=True)
+pixiv_image = on_startswith("/插画", priority=10, block=True)
 
-image_deleter = on_command("删除", rule=to_me(), permission=GROUP_ADMIN | GROUP_OWNER | SUPERUSER, priority=10,
-                           block=True)
-image_list = on_command("图片列表", rule=to_me(), permission=GROUP_ADMIN | GROUP_OWNER | SUPERUSER, priority=10,
-                        block=True)
-open_image_permission = on_command("启用", rule=to_me(), permission=GROUP_ADMIN | GROUP_OWNER | SUPERUSER, priority=10,
-                                   block=True)
-close_image_permission = on_command("禁用", rule=to_me(), permission=GROUP_ADMIN | GROUP_OWNER | SUPERUSER, priority=10,
-                                    block=True)
+image_deleter = on_startswith("/删除", rule=to_me(),
+                               permission=GROUP_ADMIN | GROUP_OWNER | SUPERUSER,
+                               priority=10, block=True)
+image_list = on_startswith("/图片列表", rule=to_me(),
+                            permission=GROUP_ADMIN | GROUP_OWNER | SUPERUSER,
+                            priority=10, block=True)
+open_image_permission = on_startswith("/启用", rule=to_me(),
+                                       permission=GROUP_ADMIN | GROUP_OWNER | SUPERUSER,
+                                       priority=10, block=True)
+close_image_permission = on_startswith("/禁用", rule=to_me(),
+                                        permission=GROUP_ADMIN | GROUP_OWNER | SUPERUSER,
+                                        priority=10, block=True)
 
-disown_image_permission = on_command("取消独占", rule=to_me(), permission=SUPERUSER, priority=10,
-                                     block=True)
-own_image_permission = on_command("独占", rule=to_me(), permission=SUPERUSER, priority=10,
-                                  block=True)
+disown_image_permission = on_startswith("/取消独占", rule=to_me(), permission=SUPERUSER,
+                                         priority=10, block=True)
+own_image_permission = on_startswith("/独占", rule=to_me(), permission=SUPERUSER,
+                                      priority=10, block=True)
 
 
 async def image_save(path, filename):
@@ -199,9 +202,9 @@ XXX后面接@[数字]可以选择词条下的指定内容
 
 
 @own_image_permission.handle()
-async def _(event: Event, args: Message = CommandArg()):
+async def _(event: Event):
     from_info = event.get_session_id()
-    key = args.extract_plain_text()
+    key = event.get_plaintext().strip()[len("/独占"):].strip()
     group = 'personal'
     if '_' in from_info:
         group = from_info.split('_')[1]
@@ -219,9 +222,9 @@ async def _(event: Event, args: Message = CommandArg()):
 
 
 @disown_image_permission.handle()
-async def _(event: Event, args: Message = CommandArg()):
+async def _(event: Event):
     from_info = event.get_session_id()
-    key = args.extract_plain_text()
+    key = event.get_plaintext().strip()[len("/取消独占"):].strip()
     group = 'personal'
     if '_' in from_info:
         group = from_info.split('_')[1]
@@ -239,9 +242,9 @@ async def _(event: Event, args: Message = CommandArg()):
 
 
 @open_image_permission.handle()
-async def _(event: Event, args: Message = CommandArg()):
+async def _(event: Event):
     from_info = event.get_session_id()
-    key = args.extract_plain_text()
+    key = event.get_plaintext().strip()[len("/启用"):].strip()
     group = 'personal'
     if '_' in from_info:
         group = from_info.split('_')[1]
@@ -269,9 +272,9 @@ async def _(event: Event, args: Message = CommandArg()):
 
 
 @close_image_permission.handle()
-async def _(event: Event, args: Message = CommandArg()):
+async def _(event: Event):
     from_info = event.get_session_id()
-    key = args.extract_plain_text()
+    key = event.get_plaintext().strip()[len("/禁用"):].strip()
     group = 'personal'
     if '_' in from_info:
         group = from_info.split('_')[1]
@@ -301,9 +304,9 @@ async def get_pixiv_image(url):
 
 
 @pixiv_image.handle()
-async def fetch_pixiv_data(args: Message = CommandArg()):
+async def fetch_pixiv_data(event: Event):
     url = "https://image.anosu.top/pixiv/json"
-    key = args.extract_plain_text()
+    key = event.get_plaintext().strip()[len("/插画"):].strip()
 
     url = url + f"?keyword={key}"
 
@@ -318,8 +321,8 @@ async def fetch_pixiv_data(args: Message = CommandArg()):
 
 
 @image_adder.handle()
-async def _(event: Event, args: Message = CommandArg()):
-    name = args.extract_plain_text()
+async def _(event: Event):
+    name = event.get_plaintext().strip()[len("/添加"):].strip()
     if not check_permission(event, name):
         await image_adder.finish(f"词条{name}被禁止使用")
     else:
@@ -355,8 +358,14 @@ async def _(event: Event):
 
 
 @get_image.handle()
-async def _(event: Event, args: Message = CommandArg()):
-    msg = args.extract_plain_text()
+async def _(event: Event):
+    raw = event.get_plaintext().strip()
+    for prefix in ("/来只", "/来点", "/来个"):
+        if raw.startswith(prefix):
+            msg = raw[len(prefix):].strip()
+            break
+    else:
+        msg = raw
 
     if not check_permission(event, msg):
         await get_image.finish(f"词条{msg}被禁止使用")
@@ -418,8 +427,8 @@ async def _(event: Event, args: Message = CommandArg()):
 
 
 @image_deleter.handle()
-async def _(event: Event, args: Message = CommandArg()):
-    name = args.extract_plain_text()
+async def _(event: Event):
+    name = event.get_plaintext().strip()[len("/删除"):].strip()
 
     if not check_permission(event, name):
         await image_deleter.finish(f"词条{name}被禁止使用")
