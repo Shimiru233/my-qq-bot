@@ -281,10 +281,9 @@ async def handle_arecent(bot: Bot, event: Event):
         await bot.send(event, "转发失败，目标 QQ 无法联系")
         return
 
-    # 首次触发时建立会话，后续触发只续期不覆盖
-    if not _recent_requester:
-        _recent_requester["bot"] = bot
-        _recent_requester["event"] = event
+    # 每次触发都更新 event（回复时发回最新位置）
+    _recent_requester["bot"] = bot
+    _recent_requester["event"] = event
 
     # 每次发消息都重置超时
     _reset_timeout(RELAY_TIMEOUT)
