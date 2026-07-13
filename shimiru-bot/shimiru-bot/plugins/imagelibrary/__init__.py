@@ -346,16 +346,14 @@ _adding_sessions: dict[str, str] = {}  # user_id → keyword
 
 async def _get_replied_images(bot: Bot, event: Event) -> list[str]:
     """获取被引用消息中的图片 URL"""
-    # LLOneBot / napcat 直接把被引消息放在 event.reply 里
+    # LLOneBot / napcat 直接把被引消息放在 event.reply 里（Reply 对象）
     reply_info = getattr(event, "reply", None)
-    logger.info(f"[imagelibrary] event.reply = {type(reply_info)} {reply_info}")
-    if reply_info and isinstance(reply_info, dict):
-        msg_content = reply_info.get("message")
-        logger.info(f"[imagelibrary] reply message type={type(msg_content)} keys={list(reply_info.keys())}")
+    if reply_info is not None:
+        msg_content = getattr(reply_info, "message", None)
         if msg_content:
+            # msg_content 是 list[MessageSegment]
             if isinstance(msg_content, Message):
                 return _extract_images(msg_content)
-            # 可能是 list[dict] 格式
             return _extract_images(Message(msg_content))
 
     # 回退：通过 bot.get_msg() 获取
