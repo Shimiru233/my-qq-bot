@@ -5,7 +5,7 @@ import threading
 import uuid
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from functools import partial
-from nonebot import on_command, on_message, get_driver
+from nonebot import on_command, on_message, on_startswith, get_driver
 from nonebot.params import EventMessage, CommandArg
 from nonebot.adapters.onebot.v11 import Bot, Event, Message, MessageSegment
 from nonebot.adapters.onebot.v11.exception import ActionFailed
@@ -266,7 +266,7 @@ _pending_recent: dict[str, asyncio.Task] = {}
 _recent_requester: dict = {}  # 当前等待回复的请求者信息
 
 
-arecentMatcher = on_command("arecent", rule=to_me())
+arecentMatcher = on_startswith("a", rule=to_me())
 
 
 @arecentMatcher.handle()
@@ -300,20 +300,30 @@ async def handle_arecent(bot: Bot, event: Event):
         t.cancel()
     _pending_recent.clear()
 
+    # 取消旧超时
+    for t in _pending_recent.values():
+        t.cancel()
+    _pending_recent.clear()
+
     # 创建超时任务
-    _pending_recent["timeout"] = asyncio.create_task(_recent_timeout(bot, event, RELAY_TIMEOUT))
+    _pending_recent["timeout"] = asyncio.create_task(_recent_timeout(RELAY_TIMEOUT))
 
     await bot.send(event, "已转发请求，等待回复...")
 
 
-async def _recent_timeout(bot: Bot, event: Event, delay: int):
+async def _recent_timeout(delay: int):
     await asyncio.sleep(delay)
     _recent_requester.clear()
     _pending_recent.clear()
-    try:
-        await bot.send(event, "recent 请求超时，没有收到回复")
-    except ActionFailed:
-        pass
+
+
+def _reset_timeout(delay: int):
+    """重置超时计时器"""
+    for t in _pending_recent.values():
+        t.cancel()
+    _pending_recent.clear()
+    if _recent_requester:
+        _pending_recent["timeout"] = asyncio.create_task(_recent_timeout(delay))
 
 
 # 监听目标 QQ 的私聊回复
@@ -330,20 +340,11 @@ async def handle_recent_reply(bot: Bot, event: Event):
     if not _recent_requester:
         return
 
-    state = _recent_requester.copy()
-    _recent_requester.clear()
+    # 直接转发（不清除状态，不删超时再新建）
+    await bot.send(_recent_requester["event"], event.get_message())
 
-    # 取消超时
-    for t in _pending_recent.values():
-        t.cancel()
-    _pending_recent.clear()
-
-    # 转发回复
-    sender = event.sender
-    target_name = sender.nickname if sender else str(TARGET_QQ)
-    forward_msg = Message(f"[{target_name} 的回复]\n") + event.get_message()
-
-    await bot.send(state["event"], forward_msg)
+    # 重置超时：每收到一条回复，窗口续期两分钟
+    _reset_timeout(RELAY_TIMEOUT)
 
 
 # ── 猜歌回答监听 ─────────────────────────────────────
