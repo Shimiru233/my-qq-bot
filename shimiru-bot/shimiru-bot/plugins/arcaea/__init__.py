@@ -271,19 +271,12 @@ arecentMatcher = on_startswith("a", rule=to_me())
 
 @arecentMatcher.handle()
 async def handle_arecent(bot: Bot, event: Event):
-    user_id = event.get_user_id()
-    group_id = getattr(event, "group_id", None)
-    sender = event.sender
-    nickname = sender.nickname if sender else user_id
-
-    # 构建转发给目标的消息
-    if group_id:
-        source = f"群 {group_id} 用户 {nickname}({user_id})"
-    else:
-        source = f"用户 {nickname}({user_id})"
+    # 取 @bot 之后的消息文本，前面拼 "/"
+    raw = event.get_plaintext().strip()
+    forward_text = f"/{raw}"
 
     try:
-        await bot.send_private_msg(user_id=TARGET_QQ, message=f"{source} 的 recent 请求")
+        await bot.send_private_msg(user_id=TARGET_QQ, message=forward_text)
     except ActionFailed:
         await bot.send(event, "转发失败，目标 QQ 无法联系")
         return
