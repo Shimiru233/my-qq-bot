@@ -5,7 +5,7 @@ import threading
 import uuid
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from functools import partial
-from nonebot import on_command, on_message, on_startswith, get_driver
+from nonebot import on_command, on_message, get_driver
 from nonebot.params import EventMessage, CommandArg
 from nonebot.adapters.onebot.v11 import Bot, Event, Message, MessageSegment
 from nonebot.adapters.onebot.v11.exception import ActionFailed
@@ -266,14 +266,13 @@ _pending_recent: dict[str, asyncio.Task] = {}
 _recent_requester: dict = {}  # 当前等待回复的请求者信息
 
 
-arecentMatcher = on_startswith("a", rule=to_me())
+arecentMatcher = on_command("a")
 
 
 @arecentMatcher.handle()
 async def handle_arecent(bot: Bot, event: Event):
-    # 取 @bot 之后的消息文本，前面拼 "/"
-    raw = event.get_plaintext().strip()
-    forward_text = f"/{raw}"
+    # 原样转发消息文本
+    forward_text = event.get_plaintext().strip()
 
     try:
         await bot.send_private_msg(user_id=TARGET_QQ, message=forward_text)
