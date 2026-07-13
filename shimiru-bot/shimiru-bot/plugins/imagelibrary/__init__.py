@@ -344,15 +344,29 @@ async def _save_images(name: str, urls: list[str]) -> int:
 _adding_sessions: dict[str, str] = {}  # user_id → keyword
 
 
-async def _get_replied_images(bot: Bot, message: Message) -> list[str]:
-    """如果消息引用了图片消息，拿到被引用消息中的图片 URL"""
-    for seg in message:
+async def _get_replied_images(bot: Bot, event: Event) -> list[str]:
+    """获取被引用消息中的图片 URL"""
+    # LLOneBot / napcat 直接把被引消息放在 event.reply 里
+    reply_info = getattr(event, "reply", None)
+    if reply_info and isinstance(reply_info, dict):
+        msg_content = reply_info.get("message")
+        if msg_content:
+            if isinstance(msg_content, Message):
+                return _extract_images(msg_content)
+            # 可能是 list[dict] 格式
+            return _extract_images(Message(msg_content))
+
+    # 回退：通过 bot.get_msg() 获取
+    for seg in event.get_message():
         if seg.type == "reply":
             msg_id = seg.data.get("id")
             if msg_id:
                 try:
                     replied = await bot.get_msg(message_id=int(msg_id))
-                    return _extract_images(replied["message"])
+                    msg_content = replied["message"]
+                    if isinstance(msg_content, Message):
+                        return _extract_images(msg_content)
+                    return _extract_images(Message(msg_content))
                 except Exception:
                     pass
             break
@@ -367,7 +381,7 @@ async def _(bot: Bot, event: Event):
 
     msg = event.get_message()
     # 当前消息或引用消息里有图片就直接存
-    images = _extract_images(msg) + await _get_replied_images(bot, msg)
+    images = _extract_images(msg) + await _get_replied_images(bot, event)
     if images:
         saved = await _save_images(name, images)
         await add_matcher.finish(f"添加成功！已收录 {saved} 张图片")
@@ -384,7 +398,7 @@ async def _(bot: Bot, event: Event):
         return
 
     msg = event.get_message()
-    images = _extract_images(msg) + await _get_replied_images(bot, msg)
+    images = _extract_images(msg) + await _get_replied_images(bot, event)
     if not images:
         await add_matcher.finish("请发送图片！")
 
