@@ -125,7 +125,7 @@ dataset.ensure_directory_exists("library")
 dataset.ensure_file_exists("image.json")
 
 image_library_introduce = on_command("关于图库", rule=to_me(), priority=10, block=True)
-image_adder = on_command("添加", rule=to_me(), priority=10, block=True)
+image_adder = on_command("添加", priority=10, block=True)
 
 get_image = on_command("来只", aliases={"来点", "来个"}, priority=10, block=True)
 pixiv_image = on_command("插画", priority=10, block=True)
