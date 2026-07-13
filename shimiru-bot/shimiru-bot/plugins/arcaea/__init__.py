@@ -259,7 +259,7 @@ async def search_song(bot: Bot, event: Event, args: Message = CommandArg()):
 
 
 # ── /arecent 消息转发 ─────────────────────────────────
-TARGET_QQ = 123456789  # TODO: 填写转发目标 QQ 号
+TARGET_QQ = 3889054356  # TODO: 填写转发目标 QQ 号
 RELAY_TIMEOUT = 120
 
 _pending_recent: dict[str, asyncio.Task] = {}
