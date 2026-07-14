@@ -179,7 +179,7 @@ async def _fetch_char_card(base: str, char_path: str,
             resp = await client.get(f"{base}{card_path}", timeout=20)
             m = re.search(art_re, resp.text)
             if m:
-                return quote(m.group(0), safe=':/?=&%')
+                return quote(m.group(1), safe=':/?=&%')
     except Exception:
         return None
 
