@@ -75,7 +75,7 @@ def main():
     args = parser.parse_args()
 
     gallery = args.gallery
-    output_dir = args.output or os.getcwd()
+    output_dir = args.output or os.path.join(os.getcwd(), gallery)
 
     api_url = f"{API_BASE}/{gallery}"
     print(f"[*] 正在获取画廊: {api_url}")

@@ -304,7 +304,7 @@ def _reset_timeout(delay: int):
 
 
 # 监听目标 QQ 的私聊回复
-recentReplyListener = on_message(priority=5)
+recentReplyListener = on_message(priority=5, block=False)
 
 
 @recentReplyListener.handle()

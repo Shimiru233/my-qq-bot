@@ -8,7 +8,7 @@
 # @File    : test.py
 # @IDE     : PyCharm
 
-from nonebot import on_startswith, require
+from nonebot import on_message, on_startswith, require
 from nonebot.rule import to_me
 from nonebot.adapters.onebot.v11 import Bot, Event, Message, MessageSegment
 from nonebot.adapters.onebot.v11.permission import GROUP_ADMIN, GROUP_OWNER
@@ -135,13 +135,15 @@ intro_matcher = on_startswith("/关于图库", rule=to_me())
 
 
 async def image_save(keyword: str, index: int, img_src: str) -> str:
-    """下载图片到词条子目录，返回本地路径"""
+    """下载图片到词条子目录，返回本地路径，失败抛异常"""
     subdir = os.path.join(data_path, "library", keyword)
     os.makedirs(subdir, exist_ok=True)
     fname = f"{index}.png"
     fpath = os.path.join(subdir, fname)
     async with aiohttp.ClientSession() as session:
         async with session.get(img_src) as response:
+            if response.status != 200:
+                raise RuntimeError(f"HTTP {response.status}")
             content = await response.read()
             with open(fpath, 'wb') as f:
                 f.write(content)
@@ -313,6 +315,24 @@ async def fetch_pixiv_data(event: Event):
         await pixiv_matcher.finish("没找到关键tag...\n不过你可以尝试翻译成日文或者英文再试一次")
 
 
+MEDIA_EXTS = {'png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp', 'mp4', 'mov', 'avi'}
+
+
+def _scan_folder(keyword: str) -> list[str]:
+    """扫描关键词子文件夹，返回所有媒体文件路径"""
+    subdir = os.path.join(data_path, "library", keyword)
+    if not os.path.isdir(subdir):
+        return []
+    files = []
+    for f in sorted(os.listdir(subdir)):
+        fpath = os.path.join(subdir, f)
+        if os.path.isfile(fpath):
+            ext = f.rsplit('.', 1)[-1].lower() if '.' in f else ''
+            if ext in MEDIA_EXTS:
+                files.append(fpath)
+    return files
+
+
 def _extract_images(message: Message) -> list[str]:
     """从消息中提取所有图片 URL"""
     urls = []
@@ -322,6 +342,42 @@ def _extract_images(message: Message) -> list[str]:
             if url:
                 urls.append(url)
     return urls
+
+
+async def _extract_forward_images(bot: Bot, message: Message) -> list[str]:
+    """从合并转发聊天记录中提取所有图片 URL"""
+    urls = []
+    for seg in message:
+        if seg.type == "forward":
+            forward_id = seg.data.get("id", "")
+            if not forward_id:
+                break
+            try:
+                forwarded = await bot.get_forward_msg(id=forward_id)
+                messages = forwarded.get("messages", []) if isinstance(forwarded, dict) else forwarded
+                for msg in messages:
+                    # msg["message"] 可能是 Message / list[dict] / 单个 segment dict
+                    content = msg.get("message", msg.get("content", msg))
+                    # 直接递归提取 URL，不依赖 Message() 构造
+                    _recurse_extract(content, urls)
+            except Exception:
+                pass
+            break
+    return urls
+
+
+def _recurse_extract(obj, urls: list):
+    """递归扫描任意嵌套结构，提取 type='image' 的 url"""
+    if isinstance(obj, Message):
+        urls.extend(_extract_images(obj))
+    elif isinstance(obj, dict):
+        if obj.get("type") == "image" and obj.get("data", {}).get("url"):
+            urls.append(obj["data"]["url"])
+        elif "message" in obj:
+            _recurse_extract(obj["message"], urls)
+    elif isinstance(obj, (list, tuple)):
+        for item in obj:
+            _recurse_extract(item, urls)
 
 
 async def _save_images(name: str, urls: list[str]) -> int:
@@ -335,45 +391,69 @@ async def _save_images(name: str, urls: list[str]) -> int:
     saved = 0
     for url in urls:
         p += 1
-        path = await image_save(name, p, url)
+        try:
+            path = await image_save(name, p, url)
+        except Exception:
+            p -= 1
+            continue
         dataset.update_value(name, str(p), path)
         saved += 1
 
-    dataset.update_value(name, "using", p)
-    if not dataset.get_value(name, "ban"):
-        dataset.update_value(name, "ban", "[]")
+    if saved > 0:
+        dataset.update_value(name, "using", p)
+        if not dataset.get_value(name, "ban"):
+            dataset.update_value(name, "ban", "[]")
     return saved
 
 
 _adding_sessions: dict[str, str] = {}  # user_id → keyword
 
 
+def _to_message(content) -> Message:
+    if isinstance(content, Message):
+        return content
+    return Message(content)
+
+
+async def _extract_all_images(bot: Bot, msg: Message) -> list[str]:
+    """从消息中提取图片：直接图片 + 引用转发中的图片"""
+    urls = _extract_images(msg)
+    # 消息中的 forward 段
+    urls += await _extract_forward_images(bot, msg)
+    return urls
+
+
 async def _get_replied_images(bot: Bot, event: Event) -> list[str]:
-    """获取被引用消息中的图片 URL"""
-    # LLOneBot / napcat 直接把被引消息放在 event.reply 里（Reply 对象）
+    """获取被引用消息中的图片 URL（含合并转发中的图片）"""
     reply_info = getattr(event, "reply", None)
+    print(f"[imagelib debug] _get_replied: event.reply exists={reply_info is not None}")
     if reply_info is not None:
         msg_content = getattr(reply_info, "message", None)
+        print(f"[imagelib debug] _get_replied: msg_content type={type(msg_content)}, len={len(msg_content) if msg_content else 0}")
         if msg_content:
-            # msg_content 是 list[MessageSegment]
-            if isinstance(msg_content, Message):
-                return _extract_images(msg_content)
-            return _extract_images(Message(msg_content))
+            m = _to_message(msg_content)
+            print(f"[imagelib debug] _get_replied: Message segments={[(s.type, s.data) for s in m]}")
+            urls = await _extract_all_images(bot, m)
+            print(f"[imagelib debug] _get_replied: got {len(urls)} urls")
+            return urls
 
-    # 回退：通过 bot.get_msg() 获取
     for seg in event.get_message():
         if seg.type == "reply":
             msg_id = seg.data.get("id")
+            print(f"[imagelib debug] _get_replied fallback: reply seg, msg_id={msg_id}")
             if msg_id:
                 try:
                     replied = await bot.get_msg(message_id=int(msg_id))
-                    msg_content = replied["message"]
-                    if isinstance(msg_content, Message):
-                        return _extract_images(msg_content)
-                    return _extract_images(Message(msg_content))
-                except Exception:
-                    pass
+                    print(f"[imagelib debug] _get_replied fallback: replied keys={list(replied.keys()) if isinstance(replied, dict) else type(replied)}")
+                    m = _to_message(replied["message"])
+                    print(f"[imagelib debug] _get_replied fallback: segments={[(s.type, s.data) for s in m]}")
+                    urls = await _extract_all_images(bot, m)
+                    print(f"[imagelib debug] _get_replied fallback: got {len(urls)} urls")
+                    return urls
+                except Exception as e:
+                    print(f"[imagelib debug] _get_replied fallback FAIL: {e}")
             break
+    print(f"[imagelib debug] _get_replied: returning []")
     return []
 
 
@@ -384,38 +464,38 @@ async def _(bot: Bot, event: Event):
         await add_matcher.finish(f"词条{name}被禁止使用")
 
     msg = event.get_message()
-    # 当前消息或引用消息里有图片就直接存
-    images = _extract_images(msg) + await _get_replied_images(bot, event)
+    # 当前消息或引用/转发里有图片就直接存
+    images = _extract_images(msg) + await _get_replied_images(bot, event) + await _extract_forward_images(bot, msg)
     if images:
         saved = await _save_images(name, images)
         await add_matcher.finish(f"添加成功！已收录 {saved} 张图片")
 
     _adding_sessions[event.get_user_id()] = name
-    await add_matcher.pause("添加什么图片？")
+    await bot.send(event, "添加什么图片？发完后输入 /done 结束")
 
 
-@add_matcher.handle()
+# 接管添加会话中的后续消息
+add_flow_matcher = on_message(priority=15, block=False)
+
+
+@add_flow_matcher.handle()
 async def _(bot: Bot, event: Event):
     user_id = event.get_user_id()
     name = _adding_sessions.get(user_id)
     if name is None:
         return
 
-    # /done 结束添加
     if event.get_plaintext().strip() == "/done":
         _adding_sessions.pop(user_id, None)
-        await add_matcher.finish("添加结束")
+        await bot.send(event, "添加结束")
         return
 
-    msg = event.get_message()
-    images = _extract_images(msg) + await _get_replied_images(bot, event)
+    images = _extract_images(event.get_message()) + await _get_replied_images(bot, event) + await _extract_forward_images(bot, event.get_message())
     if not images:
-        await add_matcher.send("请发送图片，发完后输入 /done 结束")
-        await add_matcher.pause()
+        await bot.send(event, "请发送图片，发完后输入 /done 结束")
     else:
         saved = await _save_images(name, images)
-        await add_matcher.send(f"已收录 {saved} 张图片，继续发送或输入 /done 结束")
-        await add_matcher.pause()
+        await bot.send(event, f"已收录 {saved} 张图片，继续发送或输入 /done 结束")
 
 
 @get_matcher.handle()
@@ -428,33 +508,53 @@ async def _(event: Event):
     else:
         msg = raw
 
-    if not check_permission(event, msg):
-        await get_matcher.finish(f"词条{msg}被禁止使用")
-
-    # 解析 *数字：随机取 N 张
-    count = 1   # 默认取 1 张
+    # 先解析 *数字，提取纯关键词
+    count = 1
     if '*' in msg:
         parts = msg.split('*', 1)
         msg = parts[0].strip()
         num_str = parts[1].strip()
         try:
-            num = int(num_str)
-            if num <= 0:
+            count = int(num_str)
+            if count <= 0:
                 await get_matcher.finish("*后面需要跟一个正整数")
-            # 如果词条数量 >= num，视为"取 N 张随机"；否则视为指定编号
-            p = dataset.get_value(msg, "using")
-            if not p or int(p) == 0:
-                await get_matcher.finish("他貌似还没有被添加")
-            if num <= int(p):
-                count = num
-            else:
-                await get_matcher.finish(f"编号不对哦，现在此关键词下只有{p}个条目")
         except ValueError:
             await get_matcher.finish("*后面需要跟一个数字！")
 
+    if not check_permission(event, msg):
+        await get_matcher.finish(f"词条{msg}被禁止使用")
+
+    # 确定总条目数（JSON 优先，文件夹回退）
     p = dataset.get_value(msg, "using")
     if not p or int(p) == 0:
-        await get_matcher.finish("关键词存在，但是关键词下面没有可用词条欸，是不是被删除了？")
+        files = _scan_folder(msg)
+        total = len(files)
+        if total == 0:
+            await get_matcher.finish("他貌似还没有被添加")
+    else:
+        total = int(p)
+        files = []
+
+    if count > total:
+        await get_matcher.finish(f"要太多了，此关键词下只有{total}个条目")
+
+    # 文件夹回退模式
+    if files:
+        codes = random.sample(range(total), min(count, total))
+        result = Message()
+        for idx in codes:
+            path = files[idx]
+            ext = path.rsplit('.', 1)[-1].lower() if '.' in path else ''
+            if ext in ('mp4', 'mov', 'avi'):
+                result += MessageSegment.video(path)
+            elif ext in ('png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp'):
+                result += MessageSegment.image(path)
+        if result:
+            await get_matcher.finish(result)
+        else:
+            await get_matcher.finish("没有可展示的内容")
+        return
+
     total = int(p)
 
     # 选出 count 个不重复的随机编号
