@@ -417,7 +417,7 @@ async def _(bot: Bot, event: Event):
 @get_matcher.handle()
 async def _(event: Event):
     raw = event.get_plaintext().strip()
-    for prefix in ("/来只", "/来点", "/来个"):
+    for prefix in ("/来只", "/来点", "/来个","/看"):
         if raw.startswith(prefix):
             msg = raw[len(prefix):].strip()
             break
