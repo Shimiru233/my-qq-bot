@@ -262,8 +262,14 @@ async def random_card_handler(bot: Bot, event: Event):
 watch_matcher = on_startswith("看")
 
 
+BANNED_GROUPS = {"485480236"}
+
 @watch_matcher.handle()
 async def handle_watch(bot: Bot, event: Event):
+    group_id = str(getattr(event, "group_id", ""))
+    if group_id in BANNED_GROUPS:
+        return
+
     char_name = event.get_plaintext().strip()[1:].strip()
     if not char_name:
         return
