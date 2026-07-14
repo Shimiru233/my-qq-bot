@@ -90,11 +90,11 @@ LINKLIKE_CHARS: dict[str, list[str]] = {
     "Megumi-Fujishima":           ["藤岛慈", "慈", "megumi"],
     "Ginko-Momose":               ["百生吟子", "吟子", "ginko"],
     "Kosuzu-Kachimachi":          ["徒町小铃", "小铃", "kosuzu"],
-    "Hime-Anyoji":                ["安养寺姬", "姬芽", "hime"],
-    "Ceras-Yanagida-Lilienfeld":  ["柳田赛丽丝", "赛丽丝", "ceras", "琉璃"],
+    "Hime-Anyoji":                ["安养寺姬芽", "姬芽", "hime"],
+    "Ceras-Yanagida-Lilienfeld":  ["塞拉斯·柳田·利林费尔德", "塞拉斯", "ceras"],
     "Izumi-Katsuragi":            ["桂城泉", "泉", "izumi"],
     "Mion-Shinowa":               ["篠羽美音", "美音", "mion"],
-    "Sachi-Ogami":                ["大神幸", "咲", "sachi"],
+    "Sachi-Ogami":                ["大贺美沙知", "沙知", "sachi"],
 }
 
 _linklike_lookup: dict[str, str] = {}
@@ -146,32 +146,81 @@ def get_wiki_image(card_id: int) -> Path | None:
 
 # ── SIF2 图源 ─────────────────────────────────────────
 
-async def _fetch_random(url: str, pattern: str) -> str | None:
-    """通用：抓取随机卡面图 URL"""
+async def _fetch_char_card(base: str, char_path: str,
+                           card_re: str, page_re: str,
+                           art_re: str) -> str | None:
+    """从角色卡池中随机抽一张，返回 art 图 URL。
+    步骤：列表页→随机页→随机卡片详情页→提取 art URL
+    """
     try:
         async with httpx.AsyncClient(follow_redirects=True) as client:
-            resp = await client.get(url, timeout=20)
+            # 1. 第一页 → 获取总页数
+            resp = await client.get(f"{base}{char_path}", timeout=20)
             html = resp.text
-        match = re.search(pattern, html)
-        if match:
-            return match.group(0)
+            pages = {1}
+            for m in re.finditer(page_re, html):
+                pages.add(int(m.group(1)))
+            total_pages = max(pages)
+
+            # 2. 随机选一页
+            page = random.randint(1, total_pages) if total_pages > 1 else 1
+            if page > 1:
+                resp = await client.get(f"{base}{char_path}?page={page}", timeout=20)
+                html = resp.text
+
+            # 3. 提取卡片详情页链接
+            cards = re.findall(card_re, html)
+            if not cards:
+                return None
+
+            # 4. 随机一张 → 详情页 → 提取 art
+            card_path = random.choice(cards)
+            resp = await client.get(f"{base}{card_path}", timeout=20)
+            m = re.search(art_re, resp.text)
+            if m:
+                return m.group(0)
     except Exception:
-        pass
-    return None
+        return None
 
 
-async def fetch_sif2_random() -> str | None:
-    return await _fetch_random(
-        "https://idol.st/SIF2/cards/random/",
-        r'https://i\.idol\.st/u/sif2/card/art/[^"\s]+\.png',
+async def fetch_sif2_card(char_path: str) -> str | None:
+    return await _fetch_char_card(
+        "https://idol.st", char_path,
+        r'href="(/SIF2/card/\d+/[^"]+)"',
+        r'/SIF2/cards/[^/]+/\?page=(\d+)',
+        r'https://i\.idol\.st/u/sif2/card/art/[^"&\s]+\.png',
     )
 
 
-async def fetch_linklike_random() -> str | None:
-    return await _fetch_random(
-        "https://idol.st/LinkLike/cards/random/",
-        r'https://i\.idol\.st/u/linklike/card/art/[^"\s]+\.png',
+async def fetch_linklike_card(char_path: str) -> str | None:
+    return await _fetch_char_card(
+        "https://idol.st", char_path,
+        r'href="(/LinkLike/card/\d+/[^"]+)"',
+        r'/LinkLike/cards/[^/]+/\?page=(\d+)',
+        r'https://i\.idol\.st/u/linklike/card/art/[^"&\s]+\.png',
     )
+
+
+async def fetch_sif2_global() -> str | None:
+    """全局随机（/sif2 指令用）"""
+    try:
+        async with httpx.AsyncClient(follow_redirects=True) as client:
+            resp = await client.get("https://idol.st/SIF2/cards/random/", timeout=20)
+            m = re.search(r'https://i\.idol\.st/u/sif2/card/art/[^"\s]+\.png', resp.text)
+            return m.group(0) if m else None
+    except Exception:
+        return None
+
+
+async def fetch_linklike_global() -> str | None:
+    """全局随机"""
+    try:
+        async with httpx.AsyncClient(follow_redirects=True) as client:
+            resp = await client.get("https://idol.st/LinkLike/cards/random/", timeout=20)
+            m = re.search(r'https://i\.idol\.st/u/linklike/card/art/[^"\s]+\.png', resp.text)
+            return m.group(0) if m else None
+    except Exception:
+        return None
 
 
 # ── 看 <角色名> ────────────────────────────────────────
@@ -201,23 +250,20 @@ async def handle_watch(bot: Bot, event: Event):
     choice = random.choice(sources)
 
     if choice == "sif2":
-        url = await fetch_sif2_random()
+        url = await fetch_sif2_card(f"/SIF2/cards/{sif2_path}/")
         if url:
             await bot.send(event, MessageSegment.image(url))
             return
-        # 失败回退 wiki
         if not card_ids:
             return
-        choice = "wiki"
 
     if choice == "linklike":
-        url = await fetch_linklike_random()
+        url = await fetch_linklike_card(f"/LinkLike/cards/{ll_path}/")
         if url:
             await bot.send(event, MessageSegment.image(url))
             return
         if not card_ids:
             return
-        choice = "wiki"
 
     # wiki
     card_id = random.choice(card_ids)
@@ -227,11 +273,11 @@ async def handle_watch(bot: Bot, event: Event):
     await bot.send(event, MessageSegment.image(img_path))
 
 
-# ── /sif2 随机 SIF2 卡牌 ──────────────────────────────
+# ── /sif2 全局随机 SIF2 卡牌 ───────────────────────────
 
 @sif2_matcher.handle()
 async def handle_sif2(bot: Bot, event: Event):
-    url = await fetch_sif2_random()
+    url = await fetch_sif2_global()
     if url:
         await bot.send(event, MessageSegment.image(url))
     else:
