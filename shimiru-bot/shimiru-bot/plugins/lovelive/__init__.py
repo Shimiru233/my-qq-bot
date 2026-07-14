@@ -149,7 +149,7 @@ def get_wiki_image(card_id: int) -> Path | None:
 
 async def _fetch_char_card(base: str, char_path: str,
                            card_re: str, page_re: str,
-                           art_re: str) -> str | None:
+                           art_re: str, fallback_re: str) -> str | None:
     """从角色卡池中随机抽一张，返回 art 图 URL。
     步骤：列表页→随机页→随机卡片详情页→提取 art URL
     """
@@ -178,6 +178,8 @@ async def _fetch_char_card(base: str, char_path: str,
             card_path = random.choice(cards)
             resp = await client.get(f"{base}{card_path}", timeout=20)
             m = re.search(art_re, resp.text)
+            if not m:
+                m = re.search(fallback_re, resp.text)
             if m:
                 return quote(m.group(1), safe=':/?=&%')
     except Exception:
@@ -189,6 +191,7 @@ async def fetch_sif2_card(char_path: str) -> str | None:
         "https://idol.st", char_path,
         r'href="(/SIF2/card/\d+/[^"]+)"',
         r'/SIF2/cards/[^/]+/\?page=(\d+)',
+        r'data-original-src="(https://i\.idol\.st/u/sif2/card/art/[^"]+\.png)"',
         r'img src="(https://i\.idol\.st/u/sif2/card/art/[^"]+\.png)"',
     )
 
@@ -199,6 +202,7 @@ async def fetch_linklike_card(char_path: str) -> str | None:
         r'href="(/LinkLike/card/\d+/[^"]+)"',
         r'/LinkLike/cards/[^/]+/\?page=(\d+)',
         r'img src="(https://i\.idol\.st/u/linklike/card/art[^"]+\.png)"',
+        r'img src="(https://i\.idol\.st/u/linklike/card/art[^"]+\.png)"',
     )
 
 
@@ -207,8 +211,8 @@ async def fetch_sif2_global() -> str | None:
     try:
         async with httpx.AsyncClient(follow_redirects=True) as client:
             resp = await client.get("https://idol.st/SIF2/cards/random/", timeout=20)
-            m = re.search(r'img src="(https://i\.idol\.st/u/sif2/card/art/[^"]+\.png)"', resp.text)
-            return quote(m.group(1), safe=':/?=&%') if m else None
+            m = re.search(r'data-original-src="(https://i\.idol\.st/u/sif2/card/art/[^"]+\.png)"', resp.text)
+            return m.group(1) if m else None
     except Exception:
         return None
 
