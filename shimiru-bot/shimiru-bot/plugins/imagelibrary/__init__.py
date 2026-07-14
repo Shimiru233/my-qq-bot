@@ -134,14 +134,18 @@ disown_matcher = on_startswith("/取消独占", rule=to_me(), permission=SUPERUS
 intro_matcher = on_startswith("/关于图库", rule=to_me())
 
 
-async def image_save(path, filename):
-    img_src = filename
+async def image_save(keyword: str, index: int, img_src: str) -> str:
+    """下载图片到词条子目录，返回本地路径"""
+    subdir = os.path.join(data_path, "library", keyword)
+    os.makedirs(subdir, exist_ok=True)
+    fname = f"{index}.png"
+    fpath = os.path.join(subdir, fname)
     async with aiohttp.ClientSession() as session:
         async with session.get(img_src) as response:
             content = await response.read()
-            with open(os.path.join(data_path, "library", path), 'wb') as file_obj:
-                file_obj.write(content)
-    return os.path.join(data_path, "library", path)
+            with open(fpath, 'wb') as f:
+                f.write(content)
+    return fpath
 
 
 def check_permission(event, key):
@@ -331,7 +335,7 @@ async def _save_images(name: str, urls: list[str]) -> int:
     saved = 0
     for url in urls:
         p += 1
-        path = await image_save(f"{name}{p}.png", url)
+        path = await image_save(name, p, url)
         dataset.update_value(name, str(p), path)
         saved += 1
 
@@ -461,9 +465,10 @@ async def _(event: Event):
     for code in codes:
         path = dataset.get_value(msg, str(code))
         if path and isinstance(path, str):
-            if path.endswith('.mp4'):
+            ext = path.rsplit('.', 1)[-1].lower() if '.' in path else ''
+            if ext in ('mp4', 'mov', 'avi'):
                 result += MessageSegment.video(path)
-            elif path.endswith('.png'):
+            elif ext in ('png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp'):
                 result += MessageSegment.image(path)
     if result:
         await get_matcher.finish(result)
