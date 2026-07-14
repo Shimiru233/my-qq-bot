@@ -188,7 +188,8 @@ async def fetch_sif2_card(char_path: str) -> str | None:
         "https://idol.st", char_path,
         r'href="(/SIF2/card/\d+/[^"]+)"',
         r'/SIF2/cards/[^/]+/\?page=(\d+)',
-        r'https://i\.idol\.st/u/sif2/card/art/[^"&\s]+\.png',
+        r'(https://i\.idol\.st/u/sif2/card/art/2x/[^"&\s]+\.png|'
+        r'https://i\.idol\.st/u/sif2/card/art/[^"&\s]+\.png)',
     )
 
 
@@ -197,7 +198,8 @@ async def fetch_linklike_card(char_path: str) -> str | None:
         "https://idol.st", char_path,
         r'href="(/LinkLike/card/\d+/[^"]+)"',
         r'/LinkLike/cards/[^/]+/\?page=(\d+)',
-        r'https://i\.idol\.st/u/linklike/card/art/[^"&\s]+\.png',
+        r'(https://i\.idol\.st/u/linklike/card/art_hd/[^"&\s]+\.png|'
+        r'https://i\.idol\.st/u/linklike/card/art/[^"&\s]+\.png)',
     )
 
 
@@ -206,8 +208,15 @@ async def fetch_sif2_global() -> str | None:
     try:
         async with httpx.AsyncClient(follow_redirects=True) as client:
             resp = await client.get("https://idol.st/SIF2/cards/random/", timeout=20)
-            m = re.search(r'https://i\.idol\.st/u/sif2/card/art/[^"\s]+\.png', resp.text)
-            return m.group(0) if m else None
+            urls = re.findall(
+                r'https://i\.idol\.st/u/sif2/card/art(?:/2x)?/[^"&\s]+\.png',
+                resp.text,
+            )
+            if not urls:
+                return None
+            # 优先 2x，其次普通
+            hq = [u for u in urls if '/2x/' in u]
+            return (hq or urls)[0]
     except Exception:
         return None
 
@@ -217,8 +226,14 @@ async def fetch_linklike_global() -> str | None:
     try:
         async with httpx.AsyncClient(follow_redirects=True) as client:
             resp = await client.get("https://idol.st/LinkLike/cards/random/", timeout=20)
-            m = re.search(r'https://i\.idol\.st/u/linklike/card/art/[^"\s]+\.png', resp.text)
-            return m.group(0) if m else None
+            urls = re.findall(
+                r'https://i\.idol\.st/u/linklike/card/art(?:_hd)?/[^"&\s]+\.png',
+                resp.text,
+            )
+            if not urls:
+                return None
+            hq = [u for u in urls if '/art_hd/' in u]
+            return (hq or urls)[0]
     except Exception:
         return None
 
