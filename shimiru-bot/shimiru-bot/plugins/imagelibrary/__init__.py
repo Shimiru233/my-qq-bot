@@ -123,7 +123,7 @@ dataset.ensure_directory_exists("library")
 dataset.ensure_file_exists("image.json")
 
 add_matcher = on_startswith("/添加")
-get_matcher = on_startswith(("/来只", "/来点", "/来个"))
+get_matcher = on_startswith(("/来只", "/来点", "/来个","/看"))
 pixiv_matcher = on_startswith("/插画")
 delete_matcher = on_startswith("/删除", rule=to_me(), permission=GROUP_ADMIN | GROUP_OWNER | SUPERUSER)
 list_matcher = on_startswith("/图片列表", rule=to_me(), permission=GROUP_ADMIN | GROUP_OWNER | SUPERUSER)
