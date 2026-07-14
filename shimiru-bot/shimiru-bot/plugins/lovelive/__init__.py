@@ -97,10 +97,10 @@ LINKLIKE_CHARS: dict[str, list[str]] = {
     "Sachi-Ogami":                ["大贺美沙知", "沙知", "sachi"],
 }
 
-_linklike_lookup: dict[str, str] = {}
-for _path, _aliases in LINKLIKE_CHARS.items():
-    for _a in _aliases:
-        _linklike_lookup[_a.lower()] = _path
+_linklike_lookup: dict[str, str] = {}  # 暂时禁用 LinkLike
+# for _path, _aliases in LINKLIKE_CHARS.items():
+#     for _a in _aliases:
+#         _linklike_lookup[_a.lower()] = _path
 
 CACHE_DIR.mkdir(exist_ok=True)
 
