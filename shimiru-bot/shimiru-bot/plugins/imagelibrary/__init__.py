@@ -8,7 +8,7 @@
 # @File    : test.py
 # @IDE     : PyCharm
 
-from nonebot import on_startswith, require, logger
+from nonebot import on_startswith, require
 from nonebot.rule import to_me
 from nonebot.adapters.onebot.v11 import Bot, Event, Message, MessageSegment
 from nonebot.adapters.onebot.v11.permission import GROUP_ADMIN, GROUP_OWNER
@@ -360,19 +360,16 @@ async def _get_replied_images(bot: Bot, event: Event) -> list[str]:
     for seg in event.get_message():
         if seg.type == "reply":
             msg_id = seg.data.get("id")
-            logger.info(f"[imagelibrary] fallback: reply seg found, msg_id={msg_id}")
             if msg_id:
                 try:
                     replied = await bot.get_msg(message_id=int(msg_id))
-                    logger.info(f"[imagelibrary] bot.get_msg returned: {replied}")
                     msg_content = replied["message"]
                     if isinstance(msg_content, Message):
                         return _extract_images(msg_content)
                     return _extract_images(Message(msg_content))
-                except Exception as e:
-                    logger.warning(f"[imagelibrary] bot.get_msg failed: {e}")
+                except Exception:
+                    pass
             break
-    logger.info(f"[imagelibrary] no reply images found")
     return []
 
 
@@ -383,7 +380,6 @@ async def _(bot: Bot, event: Event):
         await add_matcher.finish(f"词条{name}被禁止使用")
 
     msg = event.get_message()
-    logger.info(f"[imagelibrary] seg types: {[(s.type, s.data) for s in msg]}")
     # 当前消息或引用消息里有图片就直接存
     images = _extract_images(msg) + await _get_replied_images(bot, event)
     if images:
@@ -397,17 +393,25 @@ async def _(bot: Bot, event: Event):
 @add_matcher.handle()
 async def _(bot: Bot, event: Event):
     user_id = event.get_user_id()
-    name = _adding_sessions.pop(user_id, None)
+    name = _adding_sessions.get(user_id)
     if name is None:
+        return
+
+    # /done 结束添加
+    if event.get_plaintext().strip() == "/done":
+        _adding_sessions.pop(user_id, None)
+        await add_matcher.finish("添加结束")
         return
 
     msg = event.get_message()
     images = _extract_images(msg) + await _get_replied_images(bot, event)
     if not images:
-        await add_matcher.finish("请发送图片！")
-
-    saved = await _save_images(name, images)
-    await add_matcher.finish(f"添加成功！已收录 {saved} 张图片")
+        await add_matcher.send("请发送图片，发完后输入 /done 结束")
+        await add_matcher.pause()
+    else:
+        saved = await _save_images(name, images)
+        await add_matcher.send(f"已收录 {saved} 张图片，继续发送或输入 /done 结束")
+        await add_matcher.pause()
 
 
 @get_matcher.handle()
@@ -423,60 +427,48 @@ async def _(event: Event):
     if not check_permission(event, msg):
         await get_matcher.finish(f"词条{msg}被禁止使用")
 
-    code = 0
-    out_msg = ""
-    try:
-        if '@' in msg:
-            code = msg.split("@")[1]
-            try:
-                int(code)
-            except:
-                await get_matcher.finish("@后面需要跟一个数字！")
-            msg = msg.split("@")[0]
-        else:
+    # 解析 *数字：随机取 N 张
+    count = 1   # 默认取 1 张
+    if '*' in msg:
+        parts = msg.split('*', 1)
+        msg = parts[0].strip()
+        num_str = parts[1].strip()
+        try:
+            num = int(num_str)
+            if num <= 0:
+                await get_matcher.finish("*后面需要跟一个正整数")
+            # 如果词条数量 >= num，视为"取 N 张随机"；否则视为指定编号
             p = dataset.get_value(msg, "using")
-            if type(p) is bool:
+            if not p or int(p) == 0:
                 await get_matcher.finish("他貌似还没有被添加")
-            if int(p) == 0:
-                await get_matcher.finish("关键词存在，但是关键词下面没有可用词条欸，是不是被删除了？")
-            code = str(random.randint(1, 100000) % int(p) + 1)
+            if num <= int(p):
+                count = num
+            else:
+                await get_matcher.finish(f"编号不对哦，现在此关键词下只有{p}个条目")
+        except ValueError:
+            await get_matcher.finish("*后面需要跟一个数字！")
 
-        p = dataset.get_value(msg, "using")
-        if type(p) is bool:
-            await get_matcher.finish("他貌似还没有被添加")
-        if int(p) == 0:
-            await get_matcher.finish("关键词存在，但是关键词下面没有可用词条欸，是不是被删除了？")
-        if int(code) < 1 or int(p) < int(code):
-            await get_matcher.finish(f"标号不对哦，现在此关键词下只有{p}个条目")
+    p = dataset.get_value(msg, "using")
+    if not p or int(p) == 0:
+        await get_matcher.finish("关键词存在，但是关键词下面没有可用词条欸，是不是被删除了？")
+    total = int(p)
 
-        out_msg = str(dataset.get_value(msg, code))
-        logger.success("Get File:{}".format(out_msg))
-    except MatcherException:
-        raise
-    except:
-        await get_matcher.finish("他貌似还没有被添加")
-    if 'mp4' in out_msg[-3:]:
-        try:
-            await get_matcher.finish(MessageSegment.video(out_msg))
-        except MatcherException:
-            raise
-        except:
-            p = dataset.get_value(msg, "using")
-            del_value(msg, code)
-            await get_matcher.finish(f'这个词条好像资源出问题了,我来清理掉，应该还剩{p - 1}个内容')
-    if 'png' in out_msg[-3:]:
-        try:
-            await get_matcher.finish(MessageSegment.image(out_msg))
-        except MatcherException:
-            raise
-        except:
-            p = dataset.get_value(msg, "using")
-            del_value(msg, code)
-            await get_matcher.finish(f'这个词条好像资源出问题了,我来清理掉，应该还剩{p - 1}个内容')
+    # 选出 count 个不重复的随机编号
+    codes = random.sample(range(1, total + 1), min(count, total))
 
-    if 'False' == out_msg:
-        await get_matcher.finish('没有这个编号...')
-    await get_matcher.finish(MessageSegment.text(out_msg))
+    # 拼 Message：一次发多张
+    result = Message()
+    for code in codes:
+        path = dataset.get_value(msg, str(code))
+        if path and isinstance(path, str):
+            if path.endswith('.mp4'):
+                result += MessageSegment.video(path)
+            elif path.endswith('.png'):
+                result += MessageSegment.image(path)
+    if result:
+        await get_matcher.finish(result)
+    else:
+        await get_matcher.finish("没有可展示的内容")
 
 
 @delete_matcher.handle()
@@ -536,10 +528,7 @@ async def _(event: Event):
 async def _():
     try:
         note = dataset.get_dataset()
-        title_list = []
-        for i in note:
-            title_list.append(i)
-        title_list.remove("adding")
+        title_list = [k for k in note if k not in ("adding", "deleting")]
         msg = MessageSegment.text("Bot总共记录了{}个关键词，分别为：".format(len(title_list)) + "\n" + str(title_list))
         await list_matcher.finish(msg)
     except MatcherException:
