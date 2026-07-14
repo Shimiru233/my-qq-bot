@@ -2,6 +2,7 @@ import hashlib
 import random
 import re
 from pathlib import Path
+from urllib.parse import quote
 
 import httpx
 import yaml
@@ -178,7 +179,7 @@ async def _fetch_char_card(base: str, char_path: str,
             resp = await client.get(f"{base}{card_path}", timeout=20)
             m = re.search(art_re, resp.text)
             if m:
-                return m.group(0)
+                return quote(m.group(0), safe=':/?=&%')
     except Exception:
         return None
 
@@ -207,7 +208,7 @@ async def fetch_sif2_global() -> str | None:
         async with httpx.AsyncClient(follow_redirects=True) as client:
             resp = await client.get("https://idol.st/SIF2/cards/random/", timeout=20)
             m = re.search(r'img src="(https://i\.idol\.st/u/sif2/card/art/[^"]+\.png)"', resp.text)
-            return m.group(1) if m else None
+            return quote(m.group(1), safe=':/?=&%') if m else None
     except Exception:
         return None
 
@@ -218,7 +219,7 @@ async def fetch_linklike_global() -> str | None:
         async with httpx.AsyncClient(follow_redirects=True) as client:
             resp = await client.get("https://idol.st/LinkLike/cards/random/", timeout=20)
             m = re.search(r'img src="(https://i\.idol\.st/u/linklike/card/art[^"]+\.png)"', resp.text)
-            return m.group(1) if m else None
+            return quote(m.group(1), safe=':/?=&%') if m else None
     except Exception:
         return None
 
